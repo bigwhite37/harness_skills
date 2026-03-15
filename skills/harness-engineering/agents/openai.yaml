@@ -1,0 +1,8 @@
+interface:
+  display_name: "Harness Engineering"
+  short_description: "Compile a natural-language request into repo-native EP、Ticket、Spec、Report、Context 工件。"
+  brand_color: "#2563EB"
+  default_prompt: |
+    $harness-engineering <自然语言需求>
+policy:
+  allow_implicit_invocation: false
