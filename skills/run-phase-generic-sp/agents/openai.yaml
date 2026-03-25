@@ -1,8 +1,0 @@
-interface:
-  display_name: "Run Phase Generic"
-  short_description: "顺序推进已有 phase、milestone、lane 的 tickets，并在关键退出点给出稳定 verdict。"
-  brand_color: "#4F46E5"
-  default_prompt: |
-    $run-phase-generic-sp <phase / milestone / lane / START: T-xxx>
-policy:
-  allow_implicit_invocation: false
