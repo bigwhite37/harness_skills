@@ -42,4 +42,15 @@
 - 是否有改动把消费端 `.agents/` 或 `.claude/` 镜像目录重新引入为 repo 主布局？
 - 复制说明是否丢失了 Claude 的 `disable-model-invocation: true` 要求？
 
-如果防漂移检查中任意一项答案为“是”，这个技能就不再合规。
+## run-state 检查
+
+- `templates/run-state.md` 是否明确标记为可选？
+- run-state 是否未被写入任何文件的 YAML frontmatter？
+
+## review/verify 增强检查
+
+- `flows/review.md` 是否包含结构化审查项（Scope 对照、Plan 一致性、隐式默认搜索）？
+- `references/gate-rubric.md` 是否包含声明类型与证据类型分类？
+- `templates/verify.md` 是否包含证据来源和验证方法字段？
+
+如果防漂移检查中任意一项答案为”是”，这个技能就不再合规。

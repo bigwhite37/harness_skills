@@ -24,9 +24,7 @@
 
 ## 来源约束
 
-- `gstack` 提供价值、范围、优先级和技术路径的审视视角。
-- `superpowers` 只可用于整理方案、风险和验证契约，不可改写已通过的 `reframe`。
-- `harness engineering` 要求在进入 `build` 前先定义验证方式。
+> 来源约束见 references/boundary-rules.md
 
 ## 模板
 

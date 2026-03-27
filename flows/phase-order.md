@@ -6,6 +6,9 @@
 
 ## 允许的回退
 
+- `reframe -> blocked`
+- `reframe -> reframe-needed`
+- `plan -> blocked`
 - `plan -> reframe`
 - `ticket -> plan`
 - `build -> ticket`
@@ -24,6 +27,7 @@
 - `build` 后不得直接宣称完成。
 - 不得把 `review` 当成 `verify`。
 - 不得在内部静默重试并反复循环，却不声明阶段回退。
+- 不允许以"先做再说"代替 reframe / plan。
 
 ## 结束状态
 

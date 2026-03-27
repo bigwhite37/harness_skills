@@ -23,13 +23,7 @@
 
 ## 来源视角
 
-- `gstack`
-  - 维持固定阶段骨架，确保 `ticket` 只是把 `plan` 压缩成执行单元，而不是新增流程。
-- `superpowers`
-  - 允许在已通过的 `plan` 之内做受控任务拆解。
-  - 不允许开启并行 ticket，也不允许顺手拆出隐藏 scope。
-- `harness engineering`
-  - 要求一票一活跃，并在 ticket 体量过大或依赖失控时回退到 `plan`。
+> 来源系统视角映射见 references/source-system-mapping.md
 
 ## 失败条件
 

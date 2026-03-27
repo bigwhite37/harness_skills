@@ -15,24 +15,25 @@ description: 用于需要通过 reframe、plan、ticket、build、review、verif
 
 ## 运行时宪法
 
-1. 严格按照阶段顺序执行。
-2. 绝不跳阶段。绝不把 `review` 和 `verify` 合并。
-3. 优先快速失败，不做投机推进。
-4. 禁止静默回退。若 tool、文件、环境或检查不可用，必须明确说出。
-5. 禁止隐式默认。任何重要行为选择都必须锚定在用户请求、仓库证据，或 `reframe` 中已声明的显式假设上。
-6. 在 `reframe` 锁定范围，在 `plan` 锁定验证契约。任一项发生变化，都必须返回对应阶段。
-7. 先有 `ticket`，再做 `build`。没有活动 ticket 不得开始实现。
-8. 同一时间只允许一个活动 ticket。
-9. 只构建满足活动 ticket 的最小变更。禁止顺手加料。
-10. `review` 必须是对抗式的。它要主动寻找范围漂移、隐藏回退、不必要复杂度、回归风险和缺失测试。
-11. `verify` 依赖证据，不依赖信心。没有证据时，状态是未知，不是完成。
-12. 除非每条验收标准都有直接证据，或被明确标记为 `blocked` / `unverified`，否则不得宣称成功。
-13. 如果同一 ticket 在 `review` 或 `verify` 中反复失败，应停止局部打补丁并返回 `plan`。
-14. `blocked` 是可接受结果，隐藏不确定性不是。
-15. v1 中不得调用脚本、hooks、subagents、并行智能体、commit、PR 创建、部署或其他外部副作用流程。
-16. 在产品工作期间，不得改写 `AGENTS.md`、`CLAUDE.md` 或这个技能本身。流程改进建议应记录到 `retro`。
-17. 每次运行必须以 `retro` 结束。
-18. `handoff` 是工作流结束后的摘要产物，不是第八个阶段。
+1. 本技能是工作流治理器，不是产品决策器。
+2. 严格按照阶段顺序执行：reframe → plan → ticket → build → review → verify → retro。
+3. 绝不跳阶段。绝不把 `review` 和 `verify` 合并。
+4. 优先快速失败，不做投机推进。
+5. 禁止静默回退。若 tool、文件、环境或检查不可用，必须明确说出。
+6. 禁止隐式默认。任何重要行为选择都必须锚定在用户请求、仓库证据，或 `reframe` 中已声明的显式假设上。
+7. 在 `reframe` 锁定范围，在 `plan` 锁定验证契约。任一项发生变化，都必须返回对应阶段。
+8. 先有 `ticket`，再做 `build`。没有活动 ticket 不得开始实现。
+9. 同一时间只允许一个活动 ticket。
+10. 只构建满足活动 ticket 的最小变更。禁止顺手加料。
+11. `review` 必须是对抗式的。它要主动寻找范围漂移、隐藏回退、不必要复杂度、回归风险和缺失测试。
+12. `verify` 依赖证据，不依赖信心。没有证据时，状态是未知，不是完成。
+13. 除非每条验收标准都有直接证据，或被明确标记为 `blocked` / `unverified`，否则不得宣称成功。
+14. 如果同一 ticket 在 `review` 或 `verify` 中反复失败，应停止局部打补丁并返回 `plan`。
+15. `blocked` 是可接受结果，隐藏不确定性不是。
+16. v1 中不得调用脚本、hooks、subagents、并行智能体、commit、PR 创建、部署或其他外部副作用流程。
+17. 在产品工作期间，不得改写 `AGENTS.md`、`CLAUDE.md` 或这个技能本身。流程改进建议应记录到 `retro`。
+18. 每次运行必须以 `retro` 结束。
+19. [v1 扩展] handoff 是工作流结束后的摘要产物，不是第八个阶段。
 
 ## 宿主边界
 
@@ -43,23 +44,23 @@ description: 用于需要通过 reframe、plan、ticket、build、review、verif
 - harness engineering 负责 gate 纪律、证据纪律和失败处理的否决层。
 - 三者的具体落地映射见 `references/source-system-mapping.md`。
 
-## 必需文件
+## 分层加载策略
 
-运行这个技能时应加载以下文件：
+运行这个技能时按以下层次加载文件：
 
+### 核心层（始终加载）
+
+- `SKILL.md`
 - `flows/phase-order.md`
-- `flows/reframe.md`
-- `flows/plan.md`
-- `flows/ticket.md`
-- `flows/build.md`
-- `flows/review.md`
-- `flows/verify.md`
-- `flows/retro.md`
-- `references/stage-rules.md`
 - `references/gate-rubric.md`
-- `references/anti-patterns.md`
-- `references/boundary-rules.md`
-- `references/source-system-mapping.md`
+
+### 阶段层（按当前阶段加载）
+
+- `flows/{当前阶段}.md`
+- `templates/{当前阶段}.md`（生成输出时）
+
+### 守卫层（按阶段加载相关守卫）
+
 - `guards/quick-fail.md`
 - `guards/no-silent-fallback.md`
 - `guards/no-implicit-defaults.md`
@@ -67,25 +68,29 @@ description: 用于需要通过 reframe、plan、ticket、build、review、verif
 - `guards/phase-gate-discipline.md`
 - `guards/controlled-scope.md`
 - `guards/no-false-completion.md`
+- `guards/retro-mandatory.md`
 
-生成输出时应加载这些模板：
+### 参考层（按需加载）
 
-- `templates/reframe.md`
-- `templates/plan.md`
-- `templates/ticket.md`
-- `templates/build.md`
-- `templates/review.md`
-- `templates/verify.md`
-- `templates/retro.md`
+- `references/stage-rules.md`
+- `references/anti-patterns.md`
+- `references/boundary-rules.md`
+- `references/source-system-mapping.md`
+
+### 辅助模板（按需加载）
+
 - `templates/blocked.md`
 - `templates/handoff.md`
+- `templates/run-state.md`（可选）
 
-维护或验证这个技能时应使用这些示例和评测：
+### 维护层（维护或验证时加载）
 
 - `examples/small-bug/README.md`
 - `examples/small-feature/README.md`
 - `examples/safe-refactor/README.md`
 - `examples/blocked-run/README.md`
+- `examples/review-scope-drift/README.md`
+- `examples/verify-no-evidence/README.md`
 - `docs/usage.md`
 - `docs/self-check.md`
 - `docs/acceptance.md`
@@ -117,3 +122,13 @@ v1 不依赖隐式匹配。
 - `reframe-needed`
 
 除这三种之外，任何其他状态在 v1 中都不合规。
+
+## 术语表
+
+- **gstack**：提供阶段骨架和角色化提问视角的来源系统。它决定"怎么分阶段想"，不决定产品方向。
+- **superpowers**：提供低自由度执行增强的来源系统。只在已获准阶段和已激活 ticket 内提供受控执行能力。
+- **harness engineering**：提供 gate、evidence、quick fail、blocked 与 retro 收敛纪律的来源系统。
+- **gate**：每个阶段结束时的 go / no-go 检查点。只有 gate 通过才能进入下一阶段。
+- **guard**：横切纪律规则，任何阶段都可能触发。guard 可以 veto 一个阶段的通过。
+- **blocked**：合规的结束状态之一，表示因缺失条件或环境限制无法继续推进。
+- **handoff**：工作流结束后的摘要产物，不是第八个阶段。

@@ -22,8 +22,7 @@
 
 ## 来源约束
 
-- `superpowers` 不可在阻塞出现后静默降级继续推进。
-- `harness engineering` 要求把失败转成显式 `blocked` 状态，而不是隐式停滞。
+> 来源约束见 references/boundary-rules.md
 
 ## 模板
 

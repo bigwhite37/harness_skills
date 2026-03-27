@@ -7,7 +7,7 @@
 ## 输入
 
 - 各阶段输出
-- `review` 失败记录
+- 各阶段失败点
 - 验证证据
 - 返工点
 
@@ -16,7 +16,7 @@
 - 保留什么
 - 修改什么
 - 移除什么
-- 针对技能、文档或检查的候选改进
+- 针对 skill、AGENTS.md、evals、流程文档的候选改进
 
 ## Gate
 
@@ -25,13 +25,7 @@
 
 ## 来源视角
 
-- `gstack`
-  - 使用 `retro` 的流程学习视角，总结哪些约束、检查和切分方式有效。
-- `superpowers`
-  - 允许整理运行痕迹、返工点和学习项。
-  - 不允许借复盘直接改写规则，也不允许把 backlog 伪装成 retro。
-- `harness engineering`
-  - 要求 `retro` 成为强制收尾，并把失败模式转化为后续 guard / docs / eval 候选改进。
+> 来源系统视角映射见 references/source-system-mapping.md
 
 ## 失败条件
 

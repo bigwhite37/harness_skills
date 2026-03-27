@@ -46,3 +46,5 @@
 - 与 gate 或 evidence 无关的架构偏好输出
 - 产品优先级裁决
 - 静默把工作流治理器变成自治智能体
+
+> 来源系统的按阶段职责映射见 references/source-system-mapping.md

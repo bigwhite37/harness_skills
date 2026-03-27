@@ -23,9 +23,7 @@
 
 ## 来源约束
 
-- `gstack` 提供流程学习和复盘视角。
-- `superpowers` 只可帮助整理痕迹和学习项，不可借此直接改写规则。
-- `harness engineering` 要求 `retro` 成为强制结束阶段，并输出结构化学习。
+> 来源约束见 references/boundary-rules.md
 
 ## 模板
 

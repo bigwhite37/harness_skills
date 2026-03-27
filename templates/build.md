@@ -21,9 +21,7 @@
 
 ## 来源约束
 
-- `gstack` 只要求 `build` 服从固定阶段顺序。
-- `superpowers` 可用于文件操作和多步骤执行，但只能在活动 ticket 内工作。
-- `harness engineering` 要求发现新决策或范围膨胀时回退，不得硬推。
+> 来源约束见 references/boundary-rules.md
 
 ## 模板
 

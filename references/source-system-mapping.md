@@ -118,3 +118,5 @@
 - `harness engineering` 开始输出架构偏好，而不是 gate / evidence / fail 判定。
 
 出现越权信号时，应回退到对应阶段，或在无法恢复时输出 `blocked`。
+
+> 来源系统的边界约束汇总见 references/boundary-rules.md

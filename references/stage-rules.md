@@ -15,20 +15,16 @@
 
 ## 允许的回退
 
-- `plan -> reframe`
-- `ticket -> plan`
-- `build -> ticket`
-- `build -> plan`
-- `review -> build`
-- `review -> plan`
-- `verify -> build`
-- `verify -> plan`
-- `verify -> blocked`
+> 完整回退路径见 flows/phase-order.md
 
 ## 禁止动作
 
-- 跳过 `ticket`
-- 把 `review` 当作 `verify`
-- 在 `build` 之后宣称完成
-- 在静默本地循环中隐藏重复重试
-- 不返回 `ticket` 或 `plan` 就把单 ticket 工作膨胀成多 ticket 工作
+> 禁止动作见 flows/phase-order.md
+
+## 横切纪律
+
+所有阶段共享以下横切约束：
+
+- 每个阶段的 go / no-go 判断遵循 `references/gate-rubric.md` 统一准绳。
+- 每个阶段都受 `guards/` 目录中相关守卫的 veto 约束。
+- 任何阶段在 guard 或 gate 未通过时，都不得继续推进。

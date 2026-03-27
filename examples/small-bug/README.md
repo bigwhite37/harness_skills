@@ -10,6 +10,17 @@
 
 ## `reframe`
 
+> 可选轻量状态记录（见 templates/run-state.md）：
+>
+> ```
+> run_id: small-bug-001
+> current_phase: reframe
+> phase_status: in_progress
+> active_ticket:
+> completed_outputs:
+> blockers:
+> ```
+
 任务陈述:
 修复一个小型 parser 缺陷：当前空输入会直接崩溃，而不是返回受控错误。
 

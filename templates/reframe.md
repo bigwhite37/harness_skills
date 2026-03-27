@@ -26,9 +26,7 @@
 
 ## 来源约束
 
-- `gstack` 提供问题澄清与约束识别视角。
-- `superpowers` 只可用于探索和整理上下文，不可替用户补默认方向。
-- `harness engineering` 要求假设、未知项和阻塞项显式存在。
+> 来源约束见 references/boundary-rules.md
 
 ## 模板
 

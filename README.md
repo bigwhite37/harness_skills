@@ -31,8 +31,13 @@
 在目标仓库根目录执行：
 
 ```bash
-mkdir -p .agents/skills/convergent-dev-flow
-rsync -a --exclude '.git' /path/to/harness_skills/ .agents/skills/convergent-dev-flow/
+SRC=/path/to/harness_skills
+DEST=.agents/skills/convergent-dev-flow
+
+mkdir -p "$DEST/docs"
+cp "$SRC/SKILL.md" "$DEST/"
+cp -R "$SRC/flows" "$SRC/guards" "$SRC/templates" "$SRC/references" "$SRC/examples" "$SRC/evals" "$DEST"/
+cp "$SRC/docs/usage.md" "$SRC/docs/self-check.md" "$SRC/docs/acceptance.md" "$DEST/docs/"
 ```
 
 安装后触发：
@@ -59,8 +64,13 @@ Codex 侧还应配合宿主安全边界：
 在目标仓库根目录执行：
 
 ```bash
-mkdir -p .claude/skills/convergent-dev-flow
-rsync -a --exclude '.git' /path/to/harness_skills/ .claude/skills/convergent-dev-flow/
+SRC=/path/to/harness_skills
+DEST=.claude/skills/convergent-dev-flow
+
+mkdir -p "$DEST/docs"
+cp "$SRC/SKILL.md" "$DEST/"
+cp -R "$SRC/flows" "$SRC/guards" "$SRC/templates" "$SRC/references" "$SRC/examples" "$SRC/evals" "$DEST"/
+cp "$SRC/docs/usage.md" "$SRC/docs/self-check.md" "$SRC/docs/acceptance.md" "$DEST/docs/"
 ```
 
 然后编辑复制后的 `SKILL.md`，在 frontmatter 中加入：
@@ -98,15 +108,17 @@ Claude Code 侧还应配合宿主安全边界：
 
 如果缺少以上任一项，就不是完整技能包。
 
+不要把 `README.md`、`AGENTS.md`、`docs/raw/` 或本地配置文件一起复制到宿主技能目录。
+
 ## 安装后怎么用
 
-最小读取顺序：
+文件加载采用分层策略（详见 SKILL.md 分层加载策略）：
 
-1. 先读 [SKILL.md](SKILL.md)
-2. 再读 [flows/phase-order.md](flows/phase-order.md)
-3. 再读 [references/gate-rubric.md](references/gate-rubric.md)
-4. 根据当前阶段加载对应 `flows/*.md`
-5. 根据需要加载 `guards/*.md` 和 `templates/*.md`
+1. **核心层**（始终加载）：[SKILL.md](SKILL.md) + [flows/phase-order.md](flows/phase-order.md) + [references/gate-rubric.md](references/gate-rubric.md)
+2. **阶段层**（按当前阶段加载）：对应 `flows/*.md` + `templates/*.md`
+3. **守卫层**（按阶段加载相关守卫）：`guards/*.md`
+4. **参考层**（按需加载）：`references/stage-rules.md`、`boundary-rules.md`、`source-system-mapping.md`
+5. **辅助模板**（按需加载）：`templates/blocked.md`、`handoff.md`、`run-state.md`（可选）
 
 安装后必须保持这些纪律：
 
@@ -122,6 +134,7 @@ Claude Code 侧还应配合宿主安全边界：
 
 - 在这个公开 skill repo 里直接保留 `.agents/skills/convergent-dev-flow/` 或 `.claude/skills/convergent-dev-flow/` 作为主布局
 - 只复制 `SKILL.md`，不复制支撑文件
+- 直接把整个源码仓库根目录原样 `rsync` 到宿主技能目录
 - Claude 侧复制后不加 `disable-model-invocation: true`
 - 把宿主仓库的永久规则写回这个 skill 里
 - 让这个技能以隐式自动调用的方式运行

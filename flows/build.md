@@ -2,7 +2,7 @@
 
 ## 目的
 
-只为当前活动 ticket 实现最小必要变更。
+在当前 ticket 内做最小必要变更，而不是顺手优化整个系统。
 
 ## 输入
 
@@ -21,17 +21,11 @@
 - 变更与活动 ticket 直接对应
 - 没有未经批准的额外内容
 - 变更可以被清楚解释
-- 在进入 `review` 前已完成基础自检
+- 在进入 `review` 前已完成基础自检，不把明显坏状态交给 review
 
 ## 来源视角
 
-- `gstack`
-  - 保持阶段顺序，确保 `build` 只服务于当前活动 ticket。
-- `superpowers`
-  - 允许在活动 ticket 内做文件编辑、命令执行和多步骤实现。
-  - 不允许越过 ticket 边界顺手扩改，也不允许在没有活动 ticket 时推进实现。
-- `harness engineering`
-  - 要求在发现新决策、新依赖或范围膨胀时停止局部推进并回退阶段。
+> 来源系统视角映射见 references/source-system-mapping.md
 
 ## 失败条件
 

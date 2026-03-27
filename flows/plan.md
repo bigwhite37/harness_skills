@@ -27,14 +27,7 @@
 
 ## 来源视角
 
-- `gstack`
-  - 使用 `plan-ceo-review` 视角检查任务价值、范围和优先级合理性。
-  - 使用 `plan-eng-review` 视角检查技术路径、风险、依赖和复杂度。
-- `superpowers`
-  - 允许整理探索结果、备选方案、风险和验证契约。
-  - 不允许自行改写已通过的 `reframe`，也不允许偷换 scope。
-- `harness engineering`
-  - 要求在验证路径不清、影响面失控或存在隐藏决策时停止推进。
+> 来源系统视角映射见 references/source-system-mapping.md
 
 ## 失败条件
 

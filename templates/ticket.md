@@ -25,9 +25,7 @@
 
 ## 来源约束
 
-- `gstack` 保持阶段骨架，不允许把 `ticket` 变成新增流程阶段。
-- `superpowers` 只可在已通过的 `plan` 内做受控拆票。
-- `harness engineering` 要求同一时间只有一个活动 ticket。
+> 来源约束见 references/boundary-rules.md
 
 ## 模板
 

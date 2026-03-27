@@ -62,15 +62,25 @@
 
 ## 最小加载集
 
-始终加载：
+加载策略详见 SKILL.md 分层加载策略。简要说明：
+
+### 始终加载
 
 - `SKILL.md`
 - `flows/phase-order.md`
 - `references/gate-rubric.md`
-- 当前阶段文件
-- 相关 guard 文件
 
-只有在生成对应输出时，才加载相应模板。
+### 按阶段加载
+
+- 当前阶段的 `flows/{阶段}.md`
+- 当前阶段的 `templates/{阶段}.md`（生成输出时）
+- 相关 `guards/*.md`
+
+### 按需加载
+
+- `references/stage-rules.md`、`boundary-rules.md`、`source-system-mapping.md`
+- `templates/blocked.md`、`handoff.md`
+- `templates/run-state.md`（可选轻量状态记录）
 
 ## 必守纪律
 

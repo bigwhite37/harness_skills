@@ -23,8 +23,7 @@
 
 ## 来源约束
 
-- `gstack` 不为 `handoff` 新增阶段；它只是既有阶段完成后的摘要产物。
-- `harness engineering` 要求最终状态与证据和 blocker 严格一致。
+> 来源约束见 references/boundary-rules.md
 
 ## 模板
 
