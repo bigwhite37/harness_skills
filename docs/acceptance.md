@@ -11,6 +11,15 @@
 - 技能明确防止自己退化成自由发挥型自治智能体。
 - 运行时宪法保留了“产品工作期间不得改写 `AGENTS.md` / `CLAUDE.md` / 本技能”这条规则。
 - 使用说明明确要求把常驻仓库规则放在技能之外。
+- README 的安装节面向 LLM code agent，而不是手工复制说明。
+- 仓库根目录存在显式的 `INSTALL.md` 安装说明。
+- `INSTALL.md` 明确区分 `bootstrap install` 与 `update existing install`。
+- `INSTALL.md` 只在 `bootstrap install` 或显式 reset 时重写宿主 `AGENTS.md` / `CLAUDE.md`。
+- `INSTALL.md` 在 `update existing install` 中明确保留宿主现有 `AGENTS.md` / `CLAUDE.md`。
+- `INSTALL.md` 要求记录本轮实际使用的 `SOURCE_REF`。
+- `INSTALL.md` 在 `update existing install` 中要求记录宿主规则文件的前后校验值，并用它证明未被覆盖。
+- 仓库根目录存在宿主模板：`host-templates/AGENTS.md` 与 `host-templates/CLAUDE.md`。
+- 安装说明支持 same-ref / pinned install，而不是只支持 upstream `main`。
 - 共享 gate rubric 作为显式工件存在。
 - `gstack`、`superpowers` 与 `harness engineering` 的来源映射作为显式工件存在。
 - `gstack` 在文档中被落实为阶段骨架和角色化提问视角，而不是需求决策授权。
@@ -21,6 +30,8 @@
 - 评测用例覆盖触发检查、stage-gate 检查、回归检查 以及四类必需场景。
 - 仓库根目录是规范技能包，而不是消费端镜像布局。
 - 复制说明明确要求 Claude 侧副本加上 `disable-model-invocation: true`。
+- 安装说明同时覆盖 Codex 与 Claude Code，而不是只覆盖单一宿主。
+- bootstrap 模板存在可验证 marker，安装后可检查宿主文件是否由模板初始化。
 - 默认行为是保守收敛，而不是自动扩权。
 - `retro` 是强制阶段，不是可选项。
 

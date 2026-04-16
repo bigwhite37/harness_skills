@@ -41,6 +41,16 @@
 - 是否有改动删掉了四类必需示例或对应的 eval 覆盖？
 - 是否有改动把消费端 `.agents/` 或 `.claude/` 镜像目录重新引入为 repo 主布局？
 - 复制说明是否丢失了 Claude 的 `disable-model-invocation: true` 要求？
+- `INSTALL.md` 是否仍然存在，并要求代码代理只在 `bootstrap install` 或显式 reset 时重写宿主 `AGENTS.md` / `CLAUDE.md`？
+- `host-templates/AGENTS.md` 与 `host-templates/CLAUDE.md` 是否仍然存在并显式引用 skill 触发方式？
+- README 安装节是否仍然使用面向 agent 的 `Fetch and follow instructions .../INSTALL.md` 入口？
+- README / INSTALL 的最小安装校验是否仍然覆盖 `docs/usage.md`、`docs/self-check.md`、`docs/acceptance.md`？
+- 安装后随 skill 包复制的 `docs/usage.md` 是否仍然避免引用不会被安装进去的相对路径（如 `../INSTALL.md`）？
+- README / INSTALL 是否清晰区分了 `bootstrap install` 与保留宿主规则的 `update` 路径？
+- README / INSTALL 是否支持按同一 branch/tag/commit 安装，而不是强制漂到 upstream `main`？
+- `INSTALL.md` 是否要求记录本轮实际使用的 `SOURCE_REF`？
+- `INSTALL.md` 是否要求在 `update existing install` 中记录宿主规则文件的前后校验值，并用它证明未被覆盖？
+- README、`Makefile` 注释和 `scripts/tier2_selfcheck.sh` 的 Tier 2 断言数量是否一致？
 
 ## run-state 检查
 

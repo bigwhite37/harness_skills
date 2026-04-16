@@ -15,100 +15,121 @@
 这个仓库的规范源码结构见：
 
 - [SKILL.md](SKILL.md)
+- [INSTALL.md](INSTALL.md)
 - [docs/usage.md](docs/usage.md)
 - [AGENTS.md](AGENTS.md)
 
 ## 给代码智能体的结论
 
-如果你要安装这个技能，不要把整个仓库继续嵌套成“repo 里再放 `.agents/skills/...`”。正确做法是：
+如果你要把这个技能装进一个宿主仓库，不要手工拼接安装步骤，也不要把整个源码仓库继续嵌套成“repo 里再放 `.agents/skills/...`”。正确做法是：
 
-1. 把当前仓库根目录视为规范技能包。
-2. 把这个根目录下的技能文件复制到目标仓库的技能目录。
-3. 在目标仓库里显式触发，不依赖自动匹配。
+1. 在目标仓库根目录，把安装 prompt 直接交给代码代理。
+2. 让代理读取 [INSTALL.md](INSTALL.md) 并自动 clone / 更新源码、创建宿主目录、安装 skill。
+3. 首次安装或显式 reset 时走 `bootstrap install`：按本仓库模板重写宿主 `AGENTS.md` 与 `CLAUDE.md`。
+4. 已有安装且需要保留宿主永久规则时走 `update existing install`：只更新 skill 包，不重写宿主 `AGENTS.md` / `CLAUDE.md`。
+4. 在目标仓库里显式触发，不依赖自动匹配。
 
-## 安装到 Codex
+## 安装
 
-在目标仓库根目录执行：
+以下安装入口面向 **LLM code agent**，不是给人手工逐条敲 shell 命令的。
 
-```bash
-SRC=/path/to/harness_skills
-DEST=.agents/skills/convergent-dev-flow
+这个安装流分两种模式：
 
-mkdir -p "$DEST/docs"
-cp "$SRC/SKILL.md" "$DEST/"
-cp -R "$SRC/flows" "$SRC/guards" "$SRC/templates" "$SRC/references" "$SRC/examples" "$SRC/evals" "$DEST"/
-cp "$SRC/docs/usage.md" "$SRC/docs/self-check.md" "$SRC/docs/acceptance.md" "$DEST/docs/"
-```
+- `bootstrap install`
+  - 适用于首次安装，或你明确要把宿主 `AGENTS.md` / `CLAUDE.md` 重置为本仓库模板。
+  - 这是 **破坏性** 操作，会重写宿主常驻规则文件。
+- `update existing install`
+  - 适用于宿主已经安装过本 skill，且你要保留宿主已有永久规则。
+  - 这条路径只更新 skill 包，不重写宿主 `AGENTS.md` / `CLAUDE.md`，除非用户明确要求 reset。
 
-安装后触发：
+此外，安装 prompt 分两类：
 
-```text
-$convergent-dev-flow
-```
+- `latest main`
+  - 总是拉取 canonical upstream `main`
+- `same-ref / pinned`
+  - 使用与当前 `branch/tag/commit` 相同的 ref
+  - 换句话说，就是 `same ref` 安装
+  - 适用于 PR、release、tag、fork 或需要可复现安装的场景
 
-Codex 侧还应配合宿主安全边界：
+在目标仓库根目录，把下面 prompt 直接交给对应代理：
 
-- 优先使用 sandbox
-- 优先使用 approvals
-- 不要把这个技能放到高自治默认配置里
-
-## 安装到 Claude Code
-
-这份 git repo 可以被 Claude Code 使用，但不是“直接把当前仓库根目录当成已安装 skill 目录”来使用。正确方式是：
-
-- 把当前仓库根目录当作规范技能包来源；
-- 复制到目标仓库的 `.claude/skills/convergent-dev-flow/`；
-- 给复制后的 `SKILL.md` 增加 `disable-model-invocation: true`；
-- 然后在目标仓库里用 `/convergent-dev-flow` 显式触发。
-
-在目标仓库根目录执行：
-
-```bash
-SRC=/path/to/harness_skills
-DEST=.claude/skills/convergent-dev-flow
-
-mkdir -p "$DEST/docs"
-cp "$SRC/SKILL.md" "$DEST/"
-cp -R "$SRC/flows" "$SRC/guards" "$SRC/templates" "$SRC/references" "$SRC/examples" "$SRC/evals" "$DEST"/
-cp "$SRC/docs/usage.md" "$SRC/docs/self-check.md" "$SRC/docs/acceptance.md" "$DEST/docs/"
-```
-
-然后编辑复制后的 `SKILL.md`，在 frontmatter 中加入：
-
-```yaml
-disable-model-invocation: true
-```
-
-安装后触发：
+### Codex / Claude Code, latest main
 
 ```text
-/convergent-dev-flow
+Fetch and follow instructions from https://raw.githubusercontent.com/bigwhite37/harness_skills/refs/heads/main/INSTALL.md
 ```
 
-Claude Code 侧还应配合宿主安全边界：
+### Codex / Claude Code, same-ref or pinned install
 
-- 使用权限机制收紧这个技能
-- 配置 `allowed-tools`
-- 保留 `disable-model-invocation: true`
+```text
+Fetch and follow instructions from https://raw.githubusercontent.com/bigwhite37/harness_skills/<REF>/INSTALL.md
+```
 
-如果你只是想验证这个公开 repo 的技能能否被 Claude Code 消费，可以在单独的测试仓库里按上面的方式复制安装。不要把 `.claude/skills/convergent-dev-flow/` 目录直接提交回这个源码仓库作为主布局。
+`<REF>` 可以替换为：
+
+- `refs/heads/<branch>`
+- `refs/tags/<tag>`
+- `<commit-sha>`
+
+安装器会自动完成以下动作：
+
+- clone 或更新 `harness_skills` 源码
+- 创建 `.agents/skills/convergent-dev-flow/`
+- 创建 `.claude/skills/convergent-dev-flow/`
+- 在 `bootstrap install` 中按本仓库模板重写宿主 `AGENTS.md`
+- 在 `bootstrap install` 中按本仓库模板重写宿主 `CLAUDE.md`
+- 在 `update existing install` 中保留宿主 `AGENTS.md` / `CLAUDE.md`
+- 给 Claude 副本的 `SKILL.md` 加上 `disable-model-invocation: true`
+- 记录本轮使用的 `SOURCE_REF`
+- 在 `update existing install` 中记录宿主规则文件的前后校验结果
+- 做安装后校验并汇报结果
+
+不要把源仓库根目录里的 `AGENTS.md` 直接复制成宿主技能目录文件。宿主 `AGENTS.md` / `CLAUDE.md` 只应在 `bootstrap install` 时由安装器根据宿主模板生成。
+
+## 安装后结果
+
+安装完成后：
+
+- Codex 侧用 `$convergent-dev-flow`
+- Claude Code 侧用 `/convergent-dev-flow`
+- 宿主常驻规则落在生成后的 `AGENTS.md` / `CLAUDE.md`
+- 任务触发型工作流逻辑留在 `.agents/skills/convergent-dev-flow/` 与 `.claude/skills/convergent-dev-flow/`
 
 ## 最小安装校验
 
-复制完成后，目标仓库中至少应存在：
+安装完成后，目标仓库中至少应存在：
 
-- `SKILL.md`
-- `flows/`
-- `guards/`
-- `templates/`
-- `references/`
-- `examples/`
-- `docs/`
-- `evals/`
+- `AGENTS.md`
+- `CLAUDE.md`
+- `.agents/skills/convergent-dev-flow/SKILL.md`
+- `.claude/skills/convergent-dev-flow/SKILL.md`
+- `.agents/skills/convergent-dev-flow/flows/`
+- `.claude/skills/convergent-dev-flow/flows/`
+- `.agents/skills/convergent-dev-flow/guards/`
+- `.claude/skills/convergent-dev-flow/guards/`
+- `.agents/skills/convergent-dev-flow/templates/`
+- `.claude/skills/convergent-dev-flow/templates/`
+- `.agents/skills/convergent-dev-flow/references/`
+- `.claude/skills/convergent-dev-flow/references/`
+- `.agents/skills/convergent-dev-flow/examples/`
+- `.claude/skills/convergent-dev-flow/examples/`
+- `.agents/skills/convergent-dev-flow/evals/`
+- `.claude/skills/convergent-dev-flow/evals/`
+- `.agents/skills/convergent-dev-flow/docs/usage.md`
+- `.claude/skills/convergent-dev-flow/docs/usage.md`
+- `.agents/skills/convergent-dev-flow/docs/self-check.md`
+- `.claude/skills/convergent-dev-flow/docs/self-check.md`
+- `.agents/skills/convergent-dev-flow/docs/acceptance.md`
+- `.claude/skills/convergent-dev-flow/docs/acceptance.md`
 
-如果缺少以上任一项，就不是完整技能包。
+若缺少以上任一项，就不是完整安装。
 
-不要把 `README.md`、`AGENTS.md`、`docs/raw/` 或本地配置文件一起复制到宿主技能目录。
+若本轮执行的是 `bootstrap install` 或显式 reset，还应额外看到：
+
+- `AGENTS.md` 中的 `convergent-dev-flow bootstrap-template: AGENTS`
+- `CLAUDE.md` 中的 `convergent-dev-flow bootstrap-template: CLAUDE`
+
+不要把 `README.md`、源码仓库根目录的 `AGENTS.md`、`INSTALL.md`、`docs/raw/`、`host-templates/`、`scripts/`、`Makefile` 或本地配置文件复制到宿主技能目录。
 
 ## 安装后怎么用
 
@@ -127,6 +148,8 @@ Claude Code 侧还应配合宿主安全边界：
 - 不混合 `review` 和 `verify`
 - 不在没有证据时宣称完成
 - 不在没有 gate 或没有活动 ticket 时让 `superpowers` 推进实现
+- 宿主新增永久规则时，只追加到 `AGENTS.md` / `CLAUDE.md`，不要改写 skill 包
+- 宿主追加了永久规则后，后续升级走 `update existing install`，不要重新做 `bootstrap install`
 
 ## 不要这样安装
 
@@ -135,9 +158,44 @@ Claude Code 侧还应配合宿主安全边界：
 - 在这个公开 skill repo 里直接保留 `.agents/skills/convergent-dev-flow/` 或 `.claude/skills/convergent-dev-flow/` 作为主布局
 - 只复制 `SKILL.md`，不复制支撑文件
 - 直接把整个源码仓库根目录原样 `rsync` 到宿主技能目录
+- 跳过 `INSTALL.md`，手工只装一侧宿主
+- 在首次安装需要模板基线时不重写宿主 `AGENTS.md` / `CLAUDE.md`
+- 在已有宿主永久规则时重复做 `bootstrap install`
 - Claude 侧复制后不加 `disable-model-invocation: true`
+- 把源码仓库自己的 `AGENTS.md` 直接当成宿主 `AGENTS.md`
 - 把宿主仓库的永久规则写回这个 skill 里
 - 让这个技能以隐式自动调用的方式运行
+
+## 验证
+
+本仓库提供 3 层可执行验证（维护工具，非 skill 运行时）：
+
+| 层 | 命令 | 内容 | API 依赖 |
+|---|---|---|---|
+| Tier 1 | `make tier1` | 12 个回归断言（RC-01~RC-12） | 无 |
+| Tier 2 | `make tier2` | 16 个自检断言（SC-01~SC-16） | 无 |
+| Tier 3 | `make tier3` | 20 个 LLM-as-judge 用例（TC + SG） | ANTHROPIC_API_KEY |
+
+快速验证（无 API）：
+
+```bash
+make test
+```
+
+完整验证（含 LLM eval）：
+
+```bash
+export ANTHROPIC_API_KEY=sk-...
+make all
+```
+
+Tier 3 支持单例运行：
+
+```bash
+make tier3 ARGS="--case TC-05"
+make tier3 ARGS="--category trigger --verbose"
+make tier3 ARGS="--output results.json"
+```
 
 ## 进一步说明
 
