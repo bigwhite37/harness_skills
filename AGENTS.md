@@ -26,6 +26,11 @@
 - `docs/`
 - `evals/`
 
+安装辅助文件属于源码仓库层，不属于宿主 skill 包主结构：
+
+- `INSTALL.md`
+- `host-templates/`
+
 本仓库是规范源码包。宿主侧技能路径只是下游复制目标，不是本仓库的主布局：
 
 - Codex 目标路径：`.agents/skills/convergent-dev-flow/`

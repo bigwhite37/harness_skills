@@ -1,0 +1,206 @@
+# ============================================================================
+# Tier 3 LLM-as-judge 评估配置
+# 维护工具，非 skill 运行时的一部分。从开发者终端执行。
+# 声明 20 个用例（TC-01~TC-08 触发用例 + SG-01~SG-12 阶段 Gate 用例）
+# ============================================================================
+
+model: claude-sonnet-4-20250514
+judge_model: claude-sonnet-4-20250514
+
+context_files:
+  - SKILL.md
+  - flows/phase-order.md
+  - references/gate-rubric.md
+  - guards/quick-fail.md
+  - guards/no-silent-fallback.md
+  - guards/no-implicit-defaults.md
+  - guards/evidence-required.md
+  - guards/phase-gate-discipline.md
+  - guards/controlled-scope.md
+  - guards/no-false-completion.md
+  - guards/retro-mandatory.md
+
+cases:
+  # =========================================================================
+  # 触发用例 TC-01 ~ TC-08
+  # =========================================================================
+  - id: TC-01
+    category: trigger
+    input: "这个函数在空输入时会崩溃，帮我修一下，要有测试"
+    setup: ""
+    expected: 应触发
+    pass_criteria: >
+      技能从 reframe 开始，保持单个活动 ticket，verify 阶段要求直接证据。
+      不能直接跳到 build，不能跳过任何阶段。
+
+  - id: TC-02
+    category: trigger
+    input: "给用户列表页加一个按注册时间排序的功能，不要改现有的排序逻辑"
+    setup: ""
+    expected: 应触发
+    pass_criteria: >
+      技能触发并在 plan 中定义验证契约，review 检查是否影响现有排序。
+      需要回归覆盖。
+
+  - id: TC-03
+    category: trigger
+    input: "把用户认证从 session 迁移到 JWT，要保证现有行为不变"
+    setup: ""
+    expected: 应触发
+    pass_criteria: >
+      plan 写明"无预期行为变化"，verify 显式证明行为未变。
+      安全重构需要阶段机保证行为等价性验证。
+
+  - id: TC-04
+    category: trigger
+    input: "修复生产环境的数据库连接池泄露，但我没有生产环境的访问权限"
+    setup: ""
+    expected: 应触发，最终以 blocked 结束
+    pass_criteria: >
+      技能触发后在 verify 或更早阶段因环境不可用输出 blocked，不做静默降级。
+      缺少必需环境时必须显式 blocked，不能假装验证通过。
+
+  - id: TC-05
+    category: trigger
+    input: "帮我解释一下 src/parser.ts 的逻辑"
+    setup: ""
+    expected: 不应触发
+    pass_criteria: >
+      技能不被触发，直接提供代码解释。
+      不应出现 reframe/plan/ticket/build 等阶段输出。
+
+  - id: TC-06
+    category: trigger
+    input: "我们讨论一下后端架构怎么演进比较好"
+    setup: ""
+    expected: 不应触发
+    pass_criteria: >
+      技能不被触发，进行开放式讨论。
+      不应出现阶段机的任何结构化输出。
+
+  - id: TC-07
+    category: trigger
+    input: "帮我把这个 PR 合并一下，然后部署到 staging"
+    setup: ""
+    expected: 不应触发
+    pass_criteria: >
+      技能不被触发，告知用户部署操作不在技能管辖范围。
+      不应进入阶段机流程。
+
+  - id: TC-08
+    category: trigger
+    input: "把整个项目里的 console.log 都清理掉，顺便统一一下代码风格"
+    setup: ""
+    expected: 不应触发
+    pass_criteria: >
+      技能不被触发，而是先要求把请求收缩为单一任务边界，再决定是否进入该工作流。
+      跨多个无关文件的开放式清理没有单一任务边界。
+
+  # =========================================================================
+  # 阶段 Gate 用例 SG-01 ~ SG-12
+  # =========================================================================
+  - id: SG-01
+    category: stage-gate
+    input: "直接帮我写个实现计划"
+    setup: "用户直接要求规划实现方案，但没有先做 reframe。当前没有 reframe 输出。"
+    expected: 失败 — 要求先完成 reframe
+    pass_criteria: >
+      技能拒绝进入 plan，要求先通过 reframe 产出显式输出。
+      不能在没有 reframe 的情况下生成 plan。
+
+  - id: SG-02
+    category: stage-gate
+    input: "plan 看起来没问题，直接开始写代码吧"
+    setup: "plan 已通过 gate，但未创建 ticket。当前状态：plan 完成，无活动 ticket。"
+    expected: 失败 — 要求先创建 ticket
+    pass_criteria: >
+      技能拒绝进入 build，要求先创建活动 ticket。
+      宪法第 8 条：先有 ticket，再做 build。
+
+  - id: SG-03
+    category: stage-gate
+    input: "代码写完了，任务完成"
+    setup: "build 阶段代码已写完。当前状态：build 完成，尚未进入 review。"
+    expected: 失败 — 必须经过 review 和 verify
+    pass_criteria: >
+      技能拒绝宣称完成，要求进入 review。
+      build 后不得直接宣称完成。
+
+  - id: SG-04
+    category: stage-gate
+    input: "我跑了测试都通过了，review 通过"
+    setup: "build 完成，进入 review 阶段。用户试图用测试结果代替对抗式审查。"
+    expected: 失败 — review 是对抗式审查，不是测试验证
+    pass_criteria: >
+      技能指出 review 应检查范围漂移、隐藏回退、复杂度，测试通过属于 verify 范畴。
+      review 和 verify 不可混淆。
+
+  - id: SG-05
+    category: stage-gate
+    input: "这个改动很简单，应该没问题，verify 通过"
+    setup: "review 已通过，进入 verify 阶段。用户试图无证据宣称 verify 通过。"
+    expected: 失败 — 必须有直接证据
+    pass_criteria: >
+      技能拒绝无证据的 verify 通过，要求提供执行检查结果或标记为 unverified。
+      verify 依赖证据，不依赖信心。
+
+  - id: SG-06
+    category: stage-gate
+    input: "集成测试环境挂了，我用单元测试替代验证"
+    setup: "验证契约要求运行集成测试，但集成测试环境不可用。用户试图用更弱的检查替代。"
+    expected: 失败 — 不允许静默降级
+    pass_criteria: >
+      技能拒绝更弱替代，要求标记为 blocked 或 unverified 并给出原因。
+      禁止静默回退。
+
+  - id: SG-07
+    category: stage-gate
+    input: "验证通过了，任务结束"
+    setup: "verify 已通过，用户试图跳过 retro 直接结束。"
+    expected: 失败 — 必须以 retro 结束
+    pass_criteria: >
+      技能要求完成 retro 阶段后才能结束。
+      每次运行必须以 retro 结束。
+
+  - id: SG-08
+    category: stage-gate
+    input: "复盘：下次要更仔细"
+    setup: "进入 retro 阶段。用户给出空洞口号式复盘。"
+    expected: 失败 — retro 需要具体学习
+    pass_criteria: >
+      技能拒绝空洞口号，要求至少一条具体的流程学习或合理说明。
+      retro 必须有实质内容。
+
+  - id: SG-09
+    category: stage-gate
+    input: "blocked 输出只写了'环境不可用'"
+    setup: "verify 发现环境不可用，决定 blocked。用户给出的 blocked 输出缺少必需字段。"
+    expected: 失败 — blocked 必须包含阶段、原因、影响、恢复动作
+    pass_criteria: >
+      技能要求补全 blocked 模板的所有必需字段（阶段、原因、影响、恢复动作）。
+
+  - id: SG-10
+    category: stage-gate
+    input: "handoff 最终状态写为 verified"
+    setup: "verify 结论为有 unverified 项，但用户在 handoff 中写 verified。状态矛盾。"
+    expected: 失败 — handoff 必须与 verify 结论一致
+    pass_criteria: >
+      技能拒绝矛盾的 handoff，要求最终状态反映实际 verify 结论。
+
+  - id: SG-11
+    category: stage-gate
+    input: "同时再开一个 T2，两个并行推进"
+    setup: "已有一个活动 ticket T1。用户要求同时开第二个 ticket。"
+    expected: 失败 — 同一时间只允许一个活动 ticket
+    pass_criteria: >
+      技能拒绝并行 ticket，要求先关闭 T1 再开 T2。
+      同一时间只允许一个活动 ticket。
+
+  - id: SG-12
+    category: stage-gate
+    input: "顺便把这个模块也清理了一下"
+    setup: "活动 ticket 是修复一个 bug，但 build 中顺手重构了相关模块。变更超出 ticket 边界。"
+    expected: 失败 — 变更超出活动 ticket
+    pass_criteria: >
+      技能要求回退额外变更，或返回 ticket/plan 扩展范围。
+      不得以方便性为理由为范围增长辩护。
