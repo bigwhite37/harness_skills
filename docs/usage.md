@@ -1,6 +1,6 @@
 # 使用说明
 
-这个技能必须显式触发。不要依赖自动匹配。
+这个技能必须显式触发。不要依赖自动匹配。它是一个编排器：自己负责阶段 gate，实际在各阶段显式调用 `gstack` 与 `superpowers`。
 
 - Codex：`$convergent-dev-flow`
 - Claude Code：复制后使用 `/convergent-dev-flow`，并加上 `disable-model-invocation: true`
@@ -42,13 +42,31 @@
 
 如果这些前提会影响实现或验证，就必须在 `plan` 中写出环境基线检查与升级 / 重建路径。不能把“应该能装”“旧库应该兼容”当成默认事实。
 
+## 外部依赖
+
+运行这个技能前，当前 agent 机器上必须已经可用：
+
+- `gstack`
+  - `office-hours`
+  - `plan-ceo-review`
+  - `plan-eng-review`
+  - `review`
+  - `retro`
+  - 若验收依赖真实 UI / 浏览器用户流，还需要 `qa` 或 `qa-only`
+- `superpowers`
+  - `test-driven-development`
+  - `systematic-debugging`
+  - `verification-before-completion`
+
+若任一必需依赖缺失，不要把它解释成“方法已内化”。应先完成依赖安装，或输出 `blocked`。
+
 ## 来源系统分工
 
 - `gstack`
-  - 提供阶段骨架和角色化提问视角。
-  - 它帮助这个技能决定“怎么分阶段想”，不决定产品方向。
+  - 通过显式调用 `/office-hours`、`/plan-ceo-review`、`/plan-eng-review`、`/review`、`/retro` 提供阶段骨架和角色化提问视角。
+  - 若验收依赖真实 UI / 浏览器用户流，再显式调用 `/qa` 或 `/qa-only`。
 - `superpowers`
-  - 提供文件操作、任务拆解、多步骤执行和上下文组织这类低自由度执行增强。
+  - 通过 `test-driven-development`、`systematic-debugging`、`verification-before-completion` 提供低自由度执行增强。
   - 它只能在已经过 gate 的阶段和已经激活的 ticket 内工作。
 - `harness engineering`
   - 提供 gate、evidence、quick fail、blocked 和 retro 纪律。
@@ -61,26 +79,47 @@
 将这个技能安装到其他仓库时：
 
 1. 在宿主仓库根目录，让代码代理读取源码仓库根的 `INSTALL.md` 并执行安装。
-2. 安装器必须先判定当前是：
+2. 安装器必须先确保当前 agent 机器上的 `gstack` 与 `superpowers` 依赖已按各自官方方式安装完成。
+3. 安装器必须先判定当前是：
    - `bootstrap install`
    - `update existing install`
-3. 安装器会 clone / 更新源码仓库，并同时安装：
+4. 安装器会 clone / 更新源码仓库，并同时安装：
    - `.agents/skills/convergent-dev-flow/`
    - `.claude/skills/convergent-dev-flow/`
-4. 只有在 `bootstrap install` 或用户明确要求 reset 时，安装器才会按 `host-templates/` 下的模板重写宿主：
+5. 只有在 `bootstrap install` 或用户明确要求 reset 时，安装器才会按 `host-templates/` 下的模板重写宿主：
    - `AGENTS.md`
    - `CLAUDE.md`
-5. 在 `update existing install` 中，安装器必须保留宿主现有 `AGENTS.md` / `CLAUDE.md`。
-6. Claude Code 侧副本必须在 `SKILL.md` frontmatter 中加入 `disable-model-invocation: true`。
-7. 同时使用宿主权限机制收紧执行边界：
+6. 在 `update existing install` 中，安装器必须保留宿主现有 `AGENTS.md` / `CLAUDE.md`。
+7. Claude Code 侧副本必须在 `SKILL.md` frontmatter 中加入 `disable-model-invocation: true`。
+8. 同时使用宿主权限机制收紧执行边界：
    - Codex 侧优先使用 sandbox / approvals。
    - Claude Code 侧优先使用权限机制、`allowed-tools` 和 `disable-model-invocation: true`。
-8. 宿主仓库永远生效的规则应保留在它自己的 `AGENTS.md` 或 `CLAUDE.md` 中；安装后若需要补充，继续在宿主文件中追加。
-9. 宿主已经追加了永久规则后，后续升级走 `update existing install`，不要重新做 `bootstrap install`。
-10. 不要把 flow 文件内联进宿主仓库指令。
-11. 不要把源码仓库根目录的 `AGENTS.md` 直接复制成宿主 `AGENTS.md`。
-12. 若用户需要与当前 branch/tag/commit 一致的安装结果，应使用 same-ref / pinned install，不要默认漂到 upstream `main`。
-13. 在新宿主中的评测还未稳定前，始终显式触发这个技能。
+9. 宿主仓库永远生效的规则应保留在它自己的 `AGENTS.md` 或 `CLAUDE.md` 中；安装后若需要补充，继续在宿主文件中追加。
+10. 宿主已经追加了永久规则后，后续升级走 `update existing install`，不要重新做 `bootstrap install`。
+11. 不要把 flow 文件内联进宿主仓库指令。
+12. 不要把源码仓库根目录的 `AGENTS.md` 直接复制成宿主 `AGENTS.md`。
+13. 若用户需要与当前 branch/tag/commit 一致的安装结果，应使用 same-ref / pinned install，不要默认漂到 upstream `main`。
+14. 在新宿主中的评测还未稳定前，始终显式触发这个技能。
+
+## 阶段到技能的固定映射
+
+- `reframe`
+  - 必须显式调用 `gstack /office-hours`
+- `plan`
+  - 必须显式调用 `gstack /plan-ceo-review`
+  - 必须显式调用 `gstack /plan-eng-review`
+- `ticket`
+  - 不要求额外外部 skill，但 ticket 必须承接前一阶段结论
+- `build`
+  - 必须显式调用 `superpowers:test-driven-development`
+  - 出现 bug、失败或意外行为时，必须先调用 `superpowers:systematic-debugging`
+- `review`
+  - 必须显式调用 `gstack /review`
+- `verify`
+  - 必须显式调用 `superpowers:verification-before-completion`
+  - 若验收依赖真实 UI / 浏览器用户流，必须显式调用 `gstack /qa` 或 `/qa-only`
+- `retro`
+  - 必须显式调用 `gstack /retro`
 
 ## 最小加载集
 
@@ -133,6 +172,7 @@
 - 不得无证据宣称完成
 - 不得 静默回退
 - 不得隐藏式扩范围
+- 不得跳过上面定义的外部 skill 调用点
 
 ## 宿主职责分离
 

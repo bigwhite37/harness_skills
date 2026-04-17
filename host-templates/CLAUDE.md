@@ -8,6 +8,7 @@
 
 - 永远成立的仓库规则写在这里，不要把按任务触发的阶段机、gate、guards、模板或运行时流程抄回 `CLAUDE.md`。
 - 对非平凡开发任务，先显式触发 `/convergent-dev-flow`。
+- `convergent-dev-flow` 运行时会显式编排 `gstack` 与 `superpowers`；不要跳过它直接拼接这些下层技能，除非用户明确要求。
 - 对闲聊、翻译、纯总结、一次性问答或极小的单步变更，不要强制套用这个 skill。
 - 工作流逻辑保留在 `.claude/skills/convergent-dev-flow/`，不要把 `flows/`、`guards/`、`templates/` 的内容重新内联到宿主常驻说明文件。
 - 产品工作期间，不要改写 `AGENTS.md`、`CLAUDE.md` 或 skill 本体；流程改进建议记录到 `retro`。

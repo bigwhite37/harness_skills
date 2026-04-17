@@ -6,7 +6,7 @@ Tier 3 LLM-as-judge 评估脚本
 依赖: pip install anthropic pyyaml
 
 用法:
-  python3 scripts/tier3_llm_eval.py                    # 运行全部 24 个用例
+  python3 scripts/tier3_llm_eval.py                    # 运行全部 27 个用例
   python3 scripts/tier3_llm_eval.py --case TC-05       # 运行单个用例
   python3 scripts/tier3_llm_eval.py --category trigger  # 运行某类用例
   python3 scripts/tier3_llm_eval.py --output results.json  # 输出 JSON

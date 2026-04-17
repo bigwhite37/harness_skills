@@ -12,6 +12,8 @@
 
 ## 输出
 
+- `superpowers:verification-before-completion` 证据
+- 若适用，`gstack /qa` 或 `/qa-only` 结论
 - 验收点到证据的映射
 - 检查状态
 - 剩余风险
@@ -19,7 +21,7 @@
 
 ## 通过条件
 
-每个验收点都有直接证据，或被显式标记为 `blocked` / `unverified`。
+已显式运行 `superpowers:verification-before-completion`，且每个验收点都有直接证据，或被显式标记为 `blocked` / `unverified`。
 
 ## 来源约束
 
@@ -29,6 +31,15 @@
 
 ```md
 ## 验证
+
+verification-before-completion:
+- 调用结果:
+- 使用的最终验证命令:
+
+gstack /qa or /qa-only:
+- 是否适用:
+- 调用结果:
+- 关键发现:
 
 验收点 -> 证据:
 -

@@ -1,11 +1,11 @@
 ---
 name: convergent-dev-flow
-description: 用于需要通过 reframe、plan、ticket、build、review、verify 与 retro 固定阶段推进收敛式开发任务的场景。
+description: Use when a nontrivial development task should be driven through reframe, plan, ticket, build, review, verify, and retro, with explicit gstack and superpowers invocation under harness discipline.
 ---
 
 # Convergent Dev Flow 技能
 
-这是一个系统级工作流技能。它是流程治理器，不是产品决策器、通用编码助手，也不是高自治智能体。
+这是一个系统级工作流技能。它是 `gstack`、`superpowers` 与 `harness engineering` 的编排器，不是产品决策器、通用编码助手，也不是高自治智能体。
 
 本仓库在根目录存放规范源码包。下游应将该包复制到宿主专用的技能目录中，而不是在本仓库中保留消费端镜像目录。
 
@@ -19,7 +19,7 @@ description: 用于需要通过 reframe、plan、ticket、build、review、verif
 2. 严格按照阶段顺序执行：reframe → plan → ticket → build → review → verify → retro。
 3. 绝不跳阶段。绝不把 `review` 和 `verify` 合并。
 4. 优先快速失败，不做投机推进。
-5. 禁止静默回退。若 tool、文件、环境或检查不可用，必须明确说出。
+5. 禁止静默回退。若 `gstack`、`superpowers`、tool、文件、环境或检查不可用，必须明确说出。
 6. 禁止隐式默认。任何重要行为选择都必须锚定在用户请求、仓库证据，或 `reframe` 中已声明的显式假设上。
 7. 在 `reframe` 锁定范围，在 `plan` 锁定验证契约。任一项发生变化，都必须返回对应阶段。
 8. 先有 `ticket`，再做 `build`。没有活动 ticket 不得开始实现。
@@ -30,19 +30,36 @@ description: 用于需要通过 reframe、plan、ticket、build、review、verif
 13. 除非每条验收标准都有直接证据，或被明确标记为 `blocked` / `unverified`，否则不得宣称成功。
 14. 如果同一 ticket 在 `review` 或 `verify` 中反复失败，应停止局部打补丁并返回 `plan`。
 15. `blocked` 是可接受结果，隐藏不确定性不是。
-16. v1 中不得调用脚本、hooks、subagents、并行智能体、commit、PR 创建、部署或其他外部副作用流程。
+16. v1 不得调用脚本、hooks、subagents、并行 ticket、commit、PR 创建、部署或其他本技能自带的高自治外部副作用流程；若显式调用外部 `gstack` / `superpowers` 能力，其前提、边界与结果必须在阶段输出中留痕。
 17. 在产品工作期间，不得改写 `AGENTS.md`、`CLAUDE.md` 或这个技能本身。流程改进建议应记录到 `retro`。
 18. 每次运行必须以 `retro` 结束。
 19. [v1 扩展] handoff 是工作流结束后的摘要产物，不是第八个阶段。
+20. `reframe` 必须显式使用 `gstack` 的 `/office-hours`；`plan` 必须显式使用 `/plan-ceo-review` 与 `/plan-eng-review`；`review` 必须显式使用 `/review`；`retro` 必须显式使用 `/retro`。
+21. `build` 前必须显式使用 `superpowers:test-driven-development`；遇到意外失败必须先用 `superpowers:systematic-debugging`，再讨论修复。
+22. `verify` 前必须显式使用 `superpowers:verification-before-completion`；若验收依赖真实浏览器或端到端用户流，还必须显式使用 `gstack` 的 `/qa` 或 `/qa-only`，否则不得把 UI 行为声明标成已验证。
 
 ## 宿主边界
 
 - 永久生效的仓库规则应放在 `AGENTS.md` 或 `CLAUDE.md`，不要放进这个技能。
 - 这个技能只负责按任务触发的工作流控制。
-- gstack 提供阶段骨架和审查视角。
-- superpowers 只在已获准阶段内提供低自由度执行辅助。
+- `gstack` 通过显式技能调用提供阶段骨架与角色化审查。
+- `superpowers` 通过显式技能调用提供受 gate 和活动 ticket 约束的执行纪律。
 - harness engineering 负责 gate 纪律、证据纪律和失败处理的否决层。
 - 三者的具体落地映射见 `references/source-system-mapping.md`。
+
+## 外部依赖
+
+运行这个技能前，宿主必须已经具备以下外部能力：
+
+- `gstack`
+  - Codex: 可用的 `office-hours`、`plan-ceo-review`、`plan-eng-review`、`review`、`retro`，以及任务需要时的 `qa` / `qa-only`
+  - Claude Code: 与 Codex 等价的 `/office-hours`、`/plan-ceo-review`、`/plan-eng-review`、`/review`、`/retro`，以及任务需要时的 `/qa` / `/qa-only`
+- `superpowers`
+  - 至少具备 `test-driven-development`
+  - 至少具备 `systematic-debugging`
+  - 至少具备 `verification-before-completion`
+
+若任一必需依赖缺失，本技能必须输出 `blocked`，或回到 `INSTALL.md` 先完成依赖安装。不得把缺失依赖伪装成“内部已吸收的方法论”继续推进。
 
 ## 分层加载策略
 
@@ -106,7 +123,8 @@ description: 用于需要通过 reframe、plan、ticket、build、review、verif
 2. 检查上一阶段的输出是否存在且显式。
 3. 检查当前阶段的 gate 是否满足。
 4. 若不满足，停止并输出 `blocked`，或明确要求返回缺失的上一阶段。
-5. 不要在隐藏假设下继续推进。
+5. 检查当前阶段要求的 `gstack` / `superpowers` 技能是否可用。
+6. 不要在隐藏假设下继续推进。
 
 ## 显式触发
 
@@ -125,8 +143,8 @@ v1 不依赖隐式匹配。
 
 ## 术语表
 
-- **gstack**：提供阶段骨架和角色化提问视角的来源系统。它决定"怎么分阶段想"，不决定产品方向。
-- **superpowers**：提供低自由度执行增强的来源系统。只在已获准阶段和已激活 ticket 内提供受控执行能力。
+- **gstack**：被本技能显式调用的外部技能集。它提供 `office-hours`、`plan-ceo-review`、`plan-eng-review`、`review`、`retro`，以及按需的 `qa` / `qa-only`。
+- **superpowers**：被本技能显式调用的外部技能集。它至少提供 `test-driven-development`、`systematic-debugging` 与 `verification-before-completion`。
 - **harness engineering**：提供 gate、evidence、quick fail、blocked 与 retro 收敛纪律的来源系统。
 - **gate**：每个阶段结束时的 go / no-go 检查点。只有 gate 通过才能进入下一阶段。
 - **guard**：横切纪律规则，任何阶段都可能触发。guard 可以 veto 一个阶段的通过。

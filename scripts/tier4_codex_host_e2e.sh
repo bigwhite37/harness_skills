@@ -36,6 +36,16 @@ require_cmd() {
   fi
 }
 
+require_fixed_string() {
+  local file="$1"
+  local needle="$2"
+  local label="$3"
+  if ! grep -Fq "$needle" "$file"; then
+    echo "Missing required audit evidence ($label): $needle in $file" >&2
+    exit 1
+  fi
+}
+
 MODE="local"
 SOURCE_REF=""
 REPO_FULL_NAME="bigwhite37/harness_skills"
@@ -181,6 +191,15 @@ Hard requirements:
 - If dependencies are missing, install only the necessary Python packages with pip inside the activated \`$HOST_ENV\`.
 - End in exactly one truthful state: \`verified\`, \`blocked\`, or \`reframe-needed\`.
 - Keep implementation scope minimal.
+- The integrated audit must be explicit, not implicit:
+  - \`install-audit.md\` must record \`GSTACK_SOURCE_REPO\`, \`GSTACK_REV\`, \`SUPERPOWERS_SOURCE_REPO\`, \`SUPERPOWERS_PROVENANCE\`, and direct availability evidence for both dependency sets.
+  - \`01-reframe.md\` must include \`gstack /office-hours\`.
+  - \`02-plan.md\` must include \`gstack /plan-ceo-review\` and \`gstack /plan-eng-review\`.
+  - \`workflow-audit.md\` must include \`superpowers:test-driven-development\`.
+  - \`04-review.md\` must include \`gstack /review\`.
+  - \`05-verify.md\` must include \`superpowers:verification-before-completion\`.
+  - \`06-retro.md\` must include \`gstack /retro\`.
+- This host validation is backend API only. Unless your verify contract genuinely requires real browser acceptance, do not invent a \`gstack /qa\` requirement.
 
 Installation source:
 EOF
@@ -238,6 +257,24 @@ do
     exit 1
   fi
 done
+
+INSTALL_AUDIT="$ARTIFACT_DIR/install-audit.md"
+WORKFLOW_AUDIT="$ARTIFACT_DIR/workflow-audit.md"
+
+require_fixed_string "$INSTALL_AUDIT" 'GSTACK_SOURCE_REPO' 'gstack source repo'
+require_fixed_string "$INSTALL_AUDIT" 'GSTACK_REV' 'gstack revision'
+require_fixed_string "$INSTALL_AUDIT" 'SUPERPOWERS_SOURCE_REPO' 'superpowers source repo'
+require_fixed_string "$INSTALL_AUDIT" 'SUPERPOWERS_PROVENANCE' 'superpowers provenance'
+require_fixed_string "$INSTALL_AUDIT" 'office-hours' 'gstack availability evidence'
+require_fixed_string "$INSTALL_AUDIT" 'test-driven-development' 'superpowers availability evidence'
+
+require_fixed_string "$ARTIFACT_DIR/01-reframe.md" 'gstack /office-hours' 'reframe gstack invocation'
+require_fixed_string "$ARTIFACT_DIR/02-plan.md" 'gstack /plan-ceo-review' 'plan CEO review invocation'
+require_fixed_string "$ARTIFACT_DIR/02-plan.md" 'gstack /plan-eng-review' 'plan ENG review invocation'
+require_fixed_string "$WORKFLOW_AUDIT" 'superpowers:test-driven-development' 'build TDD invocation'
+require_fixed_string "$ARTIFACT_DIR/04-review.md" 'gstack /review' 'review gstack invocation'
+require_fixed_string "$ARTIFACT_DIR/05-verify.md" 'superpowers:verification-before-completion' 'verify superpowers invocation'
+require_fixed_string "$ARTIFACT_DIR/06-retro.md" 'gstack /retro' 'retro gstack invocation'
 
 CONDA_BASE="$(conda info --base)"
 (

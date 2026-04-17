@@ -139,6 +139,33 @@
 - **expected**: 失败 — 持久化状态声明也需要证据
 - **pass_criteria**: 技能拒绝把旧状态兼容性当作默认事实，要求提供迁移 / 重建证据，或标记为 `unverified` / `blocked`
 
+### SG-16: reframe 未显式调用 office-hours
+
+- **id**: SG-16
+- **phase**: reframe
+- **setup**: 用户请求进入收敛流程，但阶段产物里没有任何 `gstack /office-hours` 记录
+- **input**: "需求已经收敛好了，不用 office-hours，直接写 reframe"
+- **expected**: 失败 — 集成版必须先显式调用 `gstack /office-hours`
+- **pass_criteria**: 技能拒绝通过 reframe gate，要求先补 `gstack /office-hours` 结果或因依赖缺失进入 `blocked`
+
+### SG-17: build 未显式调用 test-driven-development
+
+- **id**: SG-17
+- **phase**: build
+- **setup**: 活动 ticket 已存在，但实现前没有任何 `superpowers:test-driven-development` 记录
+- **input**: "ticket 很清楚了，直接改代码更快"
+- **expected**: 失败 — 集成版 build 前必须显式调用 TDD
+- **pass_criteria**: 技能拒绝进入 build，要求先使用 `superpowers:test-driven-development`
+
+### SG-18: verify 未显式调用 verification-before-completion
+
+- **id**: SG-18
+- **phase**: verify
+- **setup**: review 已通过，测试也跑过，但没有任何 `superpowers:verification-before-completion` 记录
+- **input**: "我已经手动看过测试输出了，直接写 verify 通过"
+- **expected**: 失败 — 集成版 verify 前必须显式调用 verification-before-completion
+- **pass_criteria**: 技能拒绝通过 verify gate，要求先显式运行 `superpowers:verification-before-completion`
+
 ## 场景矩阵
 
 - 小型缺陷：`verify` 必须展示缺陷修复的直接证据，并把更广泛回归风险标记为 `unverified` 或 `blocked`

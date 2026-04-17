@@ -7,6 +7,7 @@
 - 永远成立的仓库规则放在这里，不要塞进技能的运行时流程文件。
 - 将 `docs/raw/system_skill_设计说明.md` 视为 `convergent-dev-flow` 第一版的设计依据。
 - `convergent-dev-flow` 在 v1 中必须保持为纯指令型。
+- 这里的“纯指令型”指 skill 本体不内置脚本、hooks、subagents 或其他高自治执行体；允许把 `gstack` / `superpowers` 作为外部依赖显式编排。
 - v1 不要加入脚本、hooks、subagents、并行 ticket、部署流程或其他高自治行为。
 - 保持固定流程：`reframe -> plan -> ticket -> build -> review -> verify -> retro`。
 - 保持 harness 约束：快速失败、禁止静默回退、禁止隐式默认、必须提供证据、显式 phase gate、强制 retro。
