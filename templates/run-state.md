@@ -10,6 +10,7 @@
 - **不进 frontmatter**：run-state 信息不写入任何文件的 YAML frontmatter。
 - **不做恢复协议**：run-state 只记录当前状态，不提供跨会话恢复能力。
 - **不替代阶段输出**：每个阶段的正式输出仍由对应模板产出。
+- **推荐集中落盘**：若要把阶段产物写入仓库，优先放在 `.convergent-dev-flow/runs/<run_id>/` 下，避免散落在业务目录中。
 
 ## 推荐字段
 
@@ -24,6 +25,7 @@ completed_outputs:
 -
 blockers:
 -
+artifacts_dir:
 ```
 
 ## 字段说明
@@ -34,6 +36,7 @@ blockers:
 - `active_ticket`：当前活动 ticket 编号（如有）。
 - `completed_outputs`：已通过 gate 的阶段输出列表。
 - `blockers`：当前阻塞项（如有）。
+- `artifacts_dir`：推荐的阶段产物目录，例如 `.convergent-dev-flow/runs/<run_id>/`。
 
 ## 不推荐字段
 
@@ -54,4 +57,5 @@ completed_outputs:
 -
 blockers:
 -
+artifacts_dir:
 ```

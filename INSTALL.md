@@ -32,6 +32,8 @@ ref 选择规则：
 
 优先把源码 clone 或更新到一个临时目录，再从临时目录复制安装内容。不要依赖不明来源的本地残留副本，也不要在指定了 same-ref / pinned install 时偷偷漂到 `origin/main`。
 
+如果你要对用户声称“某个已发布 ref 的公开远端安装入口已经可用”，必须先证明该 ref 的 raw `INSTALL.md` URL 可直接访问并返回 `200`。本地候选版本可以安装，不等于同一 ref 已经发布可用。
+
 ## Install Contract
 
 你必须先判定模式，再执行：
@@ -42,6 +44,11 @@ ref 选择规则：
 - `SOURCE_REF`
 
 `SOURCE_REF` 必须是这次安装实际使用的 branch/tag/commit。不要只在脑中判断；要把它写进安装过程记录和最终汇报。
+
+若本轮是“已发布 ref 的远端安装验证”，还必须额外记录：
+
+- `INSTALL_RAW_URL`
+- `INSTALL_RAW_HTTP_STATUS`
 
 ### Bootstrap install
 
@@ -212,24 +219,29 @@ Codex 副本不要添加该字段。
 2. 安装记录中存在：
    - `SOURCE_REPO`
    - `SOURCE_REF`
-3. 两侧 skill 目录都包含 `SKILL.md`、`flows/`、`guards/`、`templates/`、`references/`、`examples/`、`evals/` 和 `docs/`。
-4. 两侧 skill 目录都包含：
+3. 若本轮对外宣称的是已发布 ref 的公开安装能力，安装记录中存在：
+   - `INSTALL_RAW_URL`
+   - `INSTALL_RAW_HTTP_STATUS`
+4. 若本轮对外宣称的是已发布 ref 的公开安装能力，确认：
+   - `INSTALL_RAW_HTTP_STATUS == 200`
+5. 两侧 skill 目录都包含 `SKILL.md`、`flows/`、`guards/`、`templates/`、`references/`、`examples/`、`evals/` 和 `docs/`。
+6. 两侧 skill 目录都包含：
    - `docs/usage.md`
    - `docs/self-check.md`
    - `docs/acceptance.md`
-5. 若本轮是 `bootstrap install` 或显式 reset，`AGENTS.md` 中存在：
+7. 若本轮是 `bootstrap install` 或显式 reset，`AGENTS.md` 中存在：
    - `convergent-dev-flow bootstrap-template: AGENTS`
-6. 若本轮是 `bootstrap install` 或显式 reset，`CLAUDE.md` 中存在：
+8. 若本轮是 `bootstrap install` 或显式 reset，`CLAUDE.md` 中存在：
    - `convergent-dev-flow bootstrap-template: CLAUDE`
-7. `AGENTS.md` 中显式出现 `$convergent-dev-flow`。
-8. `CLAUDE.md` 中显式出现 `/convergent-dev-flow`。
-9. `.claude/skills/convergent-dev-flow/SKILL.md` 中存在 `disable-model-invocation: true`。
-10. 若本轮是 `update existing install`，存在：
+9. `AGENTS.md` 中显式出现 `$convergent-dev-flow`。
+10. `CLAUDE.md` 中显式出现 `/convergent-dev-flow`。
+11. `.claude/skills/convergent-dev-flow/SKILL.md` 中存在 `disable-model-invocation: true`。
+12. 若本轮是 `update existing install`，存在：
     - `AGENTS_BEFORE_SHA`
     - `AGENTS_AFTER_SHA`
     - `CLAUDE_BEFORE_SHA`
     - `CLAUDE_AFTER_SHA`
-11. 若本轮是 `update existing install`，确认：
+13. 若本轮是 `update existing install`，确认：
     - `AGENTS_BEFORE_SHA == AGENTS_AFTER_SHA`
     - `CLAUDE_BEFORE_SHA == CLAUDE_AFTER_SHA`
 
@@ -239,6 +251,7 @@ Codex 副本不要添加该字段。
 
 - 你创建或重写了哪些路径
 - 这次安装实际使用的 `SOURCE_REF`
+- 若本轮对外宣称的是已发布 ref 的公开安装能力，`INSTALL_RAW_URL` 和 `INSTALL_RAW_HTTP_STATUS`
 - Codex / Claude Code 两侧是否都安装成功
 - Claude 副本是否已补 `disable-model-invocation: true`
 - 若本轮是 `update existing install`，宿主规则文件的前后校验结果

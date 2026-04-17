@@ -27,7 +27,7 @@
 2. 让代理读取 [INSTALL.md](INSTALL.md) 并自动 clone / 更新源码、创建宿主目录、安装 skill。
 3. 首次安装或显式 reset 时走 `bootstrap install`：按本仓库模板重写宿主 `AGENTS.md` 与 `CLAUDE.md`。
 4. 已有安装且需要保留宿主永久规则时走 `update existing install`：只更新 skill 包，不重写宿主 `AGENTS.md` / `CLAUDE.md`。
-4. 在目标仓库里显式触发，不依赖自动匹配。
+5. 在目标仓库里显式触发，不依赖自动匹配。
 
 ## 安装
 
@@ -70,6 +70,8 @@ Fetch and follow instructions from https://raw.githubusercontent.com/bigwhite37/
 - `refs/heads/<branch>`
 - `refs/tags/<tag>`
 - `<commit-sha>`
+
+如果你要宣称某个 **已发布** ref 的公开安装入口已经可用，先证明它的 raw `INSTALL.md` 能直接返回 `200`。不要因为“本地候选版本能装”就倒推出“公开安装链路也没问题”。
 
 安装器会自动完成以下动作：
 
@@ -168,18 +170,26 @@ Fetch and follow instructions from https://raw.githubusercontent.com/bigwhite37/
 
 ## 验证
 
-本仓库提供 3 层可执行验证（维护工具，非 skill 运行时）：
+本仓库提供 5 个可执行验证入口（维护工具，非 skill 运行时）：
 
 | 层 | 命令 | 内容 | API 依赖 |
 |---|---|---|---|
+| Published Ref Probe | `make probe-install REF=refs/heads/main` | 验证某个已发布 ref 的 raw `INSTALL.md` 是否可直接访问 | 网络 |
 | Tier 1 | `make tier1` | 12 个回归断言（RC-01~RC-12） | 无 |
-| Tier 2 | `make tier2` | 16 个自检断言（SC-01~SC-16） | 无 |
-| Tier 3 | `make tier3` | 20 个 LLM-as-judge 用例（TC + SG） | ANTHROPIC_API_KEY |
+| Tier 2 | `make tier2` | 21 个自检断言（SC-01~SC-21） | 无 |
+| Tier 3 | `make tier3` | 24 个 LLM-as-judge 用例（TC + SG） | ANTHROPIC_API_KEY |
+| Tier 4 | `make tier4` | 只用 Codex 的宿主黑盒验证，覆盖安装链路 + 真实开发闭环 | Codex CLI + OpenAI auth + `conda` `py310` |
 
 快速验证（无 API）：
 
 ```bash
 make test
+```
+
+已发布 ref 的公开安装入口探测：
+
+```bash
+make probe-install REF=refs/heads/main
 ```
 
 完整验证（含 LLM eval）：
@@ -188,6 +198,15 @@ make test
 export ANTHROPIC_API_KEY=sk-...
 make all
 ```
+
+Codex 黑盒宿主验证：
+
+```bash
+make tier4
+make tier4 ARGS="--mode remote --source-ref refs/heads/main"
+```
+
+`make all` 仍然只覆盖 Tier 1-3；`probe-install` 与 `tier4` 单独执行，因为它们分别依赖已发布 ref 和 Codex CLI / OpenAI 额度。
 
 Tier 3 支持单例运行：
 

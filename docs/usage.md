@@ -31,6 +31,17 @@
 6. 以 `retro` 结束。
 7. 只有在 工作流已经结束后，才输出 `handoff` 作为摘要产物。
 
+## 环境基线前置检查
+
+在 `reframe` 或最迟 `plan`，显式锁定以下前提，不要等到 `build` 中途再撞墙：
+
+- 解释器 / 运行时版本
+- 包管理方式与依赖安装路径
+- 权限 / 网络约束
+- 持久化状态基线，例如旧数据库、缓存、索引或文件格式
+
+如果这些前提会影响实现或验证，就必须在 `plan` 中写出环境基线检查与升级 / 重建路径。不能把“应该能装”“旧库应该兼容”当成默认事实。
+
 ## 来源系统分工
 
 - `gstack`
@@ -92,6 +103,28 @@
 - `references/stage-rules.md`、`boundary-rules.md`、`source-system-mapping.md`
 - `templates/blocked.md`、`handoff.md`
 - `templates/run-state.md`（可选轻量状态记录）
+
+## 推荐工件目录
+
+若要把单次运行的阶段产物落盘到宿主仓库，推荐使用：
+
+```text
+.convergent-dev-flow/runs/<run_id>/
+  01-reframe.md
+  02-plan.md
+  03-ticket.md
+  04-review.md
+  05-verify.md
+  06-retro.md
+  verify-evidence.txt
+```
+
+宿主若还需要记录安装或总审计，可在同一目录中附加：
+
+- `install-audit.md`
+- `workflow-audit.md`
+
+这不是强制要求，但它能让 black-box 宿主验证与后续复核有稳定的检查路径。
 
 ## 必守纪律
 

@@ -274,7 +274,7 @@ sc16() {
   local invoked_count
   defined_count=$(rg -n '^sc[0-9]+\(\)' "$ROOT/scripts/tier2_selfcheck.sh" | wc -l | tr -d ' ')
   invoked_count=$(awk '
-    /^sc01$/,/^sc16$/ {
+    /^sc01$/,/^sc21$/ {
       if ($0 ~ /^sc[0-9]+$/) count++
     }
     END { print count + 0 }
@@ -290,6 +290,94 @@ sc16() {
     pass "$id"
   else
     fail "$id" "Tier 2 数量未真实对齐，或 INSTALL.md 缺少 update preservation evidence 字段"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# SC-17: 已发布 ref 的远程安装探测链路存在且被文档化
+# ---------------------------------------------------------------------------
+sc17() {
+  local id="SC-17 published ref probe"
+  local ok=true
+  [ -f "$ROOT/scripts/check_remote_install.sh" ] || ok=false
+  grep -q 'make probe-install' "$ROOT/README.md" || ok=false
+  grep -q 'INSTALL_RAW_URL' "$ROOT/INSTALL.md" || ok=false
+  grep -q 'INSTALL_RAW_HTTP_STATUS' "$ROOT/INSTALL.md" || ok=false
+  grep -q -E '返回 `200`|HTTP 200|INSTALL_RAW_HTTP_STATUS == 200' "$ROOT/INSTALL.md" || ok=false
+  if $ok; then
+    pass "$id"
+  else
+    fail "$id" "缺少 published ref probe 脚本，或 README/INSTALL.md 未要求记录 raw INSTALL.md 可访问性证据"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# SC-18: Tier 4 Codex 黑盒宿主验证入口存在并锁定模型/环境
+# ---------------------------------------------------------------------------
+sc18() {
+  local id="SC-18 Tier 4 Codex host e2e"
+  local ok=true
+  [ -f "$ROOT/scripts/tier4_codex_host_e2e.sh" ] || ok=false
+  grep -q 'codex exec' "$ROOT/scripts/tier4_codex_host_e2e.sh" || ok=false
+  grep -q 'gpt-5.4' "$ROOT/scripts/tier4_codex_host_e2e.sh" || ok=false
+  grep -q 'xhigh' "$ROOT/scripts/tier4_codex_host_e2e.sh" || ok=false
+  grep -q 'py310' "$ROOT/scripts/tier4_codex_host_e2e.sh" || ok=false
+  grep -q '\.convergent-dev-flow/runs/' "$ROOT/scripts/tier4_codex_host_e2e.sh" || ok=false
+  if $ok; then
+    pass "$id"
+  else
+    fail "$id" "缺少 Tier 4 Codex 黑盒验证脚本，或未锁定 gpt-5.4 / xhigh / py310 / 标准工件目录"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# SC-19: reframe/plan/gate-rubric 明确环境基线
+# ---------------------------------------------------------------------------
+sc19() {
+  local id="SC-19 环境基线前置检查"
+  local ok=true
+  grep -q '环境基线声明' "$ROOT/references/gate-rubric.md" || ok=false
+  grep -q '环境/工具链前提' "$ROOT/templates/reframe.md" || ok=false
+  grep -q '环境基线检查' "$ROOT/templates/plan.md" || ok=false
+  grep -q '环境前提' "$ROOT/flows/reframe.md" || ok=false
+  grep -q '环境基线' "$ROOT/flows/plan.md" || ok=false
+  if $ok; then
+    pass "$id"
+  else
+    fail "$id" "reframe/plan/gate-rubric 尚未完整覆盖环境基线前置检查"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# SC-20: review/verify 覆盖持久化状态升级风险
+# ---------------------------------------------------------------------------
+sc20() {
+  local id="SC-20 持久化状态升级风险"
+  local ok=true
+  grep -q '持久化状态升级影响' "$ROOT/flows/review.md" || ok=false
+  grep -q '持久化状态' "$ROOT/flows/verify.md" || ok=false
+  grep -q '持久化状态升级风险' "$ROOT/templates/review.md" || ok=false
+  grep -q '持久化状态/迁移证据' "$ROOT/templates/verify.md" || ok=false
+  if $ok; then
+    pass "$id"
+  else
+    fail "$id" "review/verify 尚未显式检查持久化状态升级风险与证据"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# SC-21: run-state / usage 文档约定标准工件目录
+# ---------------------------------------------------------------------------
+sc21() {
+  local id="SC-21 标准工件目录"
+  local ok=true
+  grep -q '\.convergent-dev-flow/runs/<run_id>/' "$ROOT/templates/run-state.md" || ok=false
+  grep -q '\.convergent-dev-flow/runs/<run_id>/' "$ROOT/docs/usage.md" || ok=false
+  grep -q 'workflow-audit.md' "$ROOT/docs/usage.md" || ok=false
+  if $ok; then
+    pass "$id"
+  else
+    fail "$id" "run-state 或 usage 文档尚未约定标准工件目录"
   fi
 }
 
@@ -315,6 +403,11 @@ sc13
 sc14
 sc15
 sc16
+sc17
+sc18
+sc19
+sc20
+sc21
 
 echo ""
 echo "=== 汇总: $PASS_COUNT PASS / $FAIL_COUNT FAIL (共 $((PASS_COUNT + FAIL_COUNT))) ==="
