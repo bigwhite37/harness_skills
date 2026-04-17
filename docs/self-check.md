@@ -49,18 +49,28 @@
 - README / INSTALL 是否清晰区分了 `bootstrap install` 与保留宿主规则的 `update` 路径？
 - README / INSTALL 是否支持按同一 branch/tag/commit 安装，而不是强制漂到 upstream `main`？
 - `INSTALL.md` 是否要求记录本轮实际使用的 `SOURCE_REF`？
+- 若对外宣称某个已发布 ref 的公开安装入口可用，是否要求先证明该 ref 的 raw `INSTALL.md` 返回 `200`？
 - `INSTALL.md` 是否要求在 `update existing install` 中记录宿主规则文件的前后校验值，并用它证明未被覆盖？
 - README、`Makefile` 注释和 `scripts/tier2_selfcheck.sh` 的 Tier 2 断言数量是否一致？
+- 是否存在只用 Codex 的宿主黑盒验证入口，并显式锁定 `gpt-5.4`、`xhigh` 和 `py310`？
 
 ## run-state 检查
 
 - `templates/run-state.md` 是否明确标记为可选？
 - run-state 是否未被写入任何文件的 YAML frontmatter？
+- 是否给出了推荐的阶段产物集中落盘目录，例如 `.convergent-dev-flow/runs/<run_id>/`？
 
 ## review/verify 增强检查
 
 - `flows/review.md` 是否包含结构化审查项（Scope 对照、Plan 一致性、隐式默认搜索）？
+- `flows/review.md` 是否显式检查持久化状态升级影响？
 - `references/gate-rubric.md` 是否包含声明类型与证据类型分类？
 - `templates/verify.md` 是否包含证据来源和验证方法字段？
+- `templates/review.md` 和 `templates/verify.md` 是否都覆盖了持久化状态 / 迁移风险记录？
+
+## 环境基线检查
+
+- `flows/reframe.md`、`flows/plan.md` 与 `references/gate-rubric.md` 是否都要求显式检查解释器、包管理、权限/网络和持久化状态基线？
+- `templates/reframe.md` 与 `templates/plan.md` 是否都为环境基线和状态升级路径预留了字段？
 
 如果防漂移检查中任意一项答案为”是”，这个技能就不再合规。

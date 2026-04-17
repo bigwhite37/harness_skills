@@ -18,6 +18,7 @@
 - `INSTALL.md` 在 `update existing install` 中明确保留宿主现有 `AGENTS.md` / `CLAUDE.md`。
 - `INSTALL.md` 要求记录本轮实际使用的 `SOURCE_REF`。
 - `INSTALL.md` 在 `update existing install` 中要求记录宿主规则文件的前后校验值，并用它证明未被覆盖。
+- 若对外宣称某个已发布 ref 的公开远端安装能力，必须先证明该 ref 的 raw `INSTALL.md` URL 返回 `200`。
 - 仓库根目录存在宿主模板：`host-templates/AGENTS.md` 与 `host-templates/CLAUDE.md`。
 - 安装说明支持 same-ref / pinned install，而不是只支持 upstream `main`。
 - 共享 gate rubric 作为显式工件存在。
@@ -34,6 +35,9 @@
 - bootstrap 模板存在可验证 marker，安装后可检查宿主文件是否由模板初始化。
 - 默认行为是保守收敛，而不是自动扩权。
 - `retro` 是强制阶段，不是可选项。
+- 存在只用 Codex 的宿主黑盒验证入口，并显式锁定 `gpt-5.4`、`xhigh` 和 `py310`。
+- `reframe` / `plan` / gate rubric 显式要求环境基线检查（解释器、包管理、权限/网络、持久化状态）。
+- 推荐的阶段产物集中落盘目录作为显式约定存在。
 
 ## 不通过条件
 
@@ -51,7 +55,9 @@
 
 - `flows/review.md` 包含结构化审查项（Scope 对照、Plan 一致性、隐式默认搜索）。
 - `templates/review.md` 包含复杂度审计和测试契约对照字段。
+- `templates/review.md` 包含持久化状态升级风险字段。
 - review 的结构化审查项覆盖了 ticket 边界、plan 一致性和隐式默认三个维度。
+- review 的结构化审查项覆盖了持久化状态升级影响。
 - review 模板输出能帮助 reviewer 判断变更是否超出最小必要范围。
 
 ## verify 增强验收条件
@@ -59,6 +65,7 @@
 - `references/gate-rubric.md` 包含声明类型与证据类型分类（静态结构、行为、外部环境）。
 - `flows/verify.md` 的 gate 条件引用了声明类型分类规则。
 - `templates/verify.md` 包含证据来源和验证方法字段。
+- `templates/verify.md` 包含持久化状态 / 迁移证据字段。
 - 行为声明在环境缺失时只能标记为 `blocked` 或 `unverified`，不允许降级验证。
 
 ## 若提供可选 run-state，则必须满足

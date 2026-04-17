@@ -112,6 +112,33 @@
 - **expected**: 失败 — 变更超出活动 ticket
 - **pass_criteria**: 技能要求回退额外变更，或返回 ticket/plan 扩展范围
 
+### SG-13: reframe 未锁定环境基线
+
+- **id**: SG-13
+- **phase**: reframe
+- **setup**: 用户请求依赖特定 Python 版本和旧数据库状态，但 reframe 没写解释器、包管理或持久化状态基线
+- **input**: "需求已经很清楚了，直接进入 plan 吧"
+- **expected**: 失败 — 必须先把环境前提写明
+- **pass_criteria**: 技能拒绝进入 plan，要求补全解释器 / 包管理 / 权限或持久化状态基线
+
+### SG-14: review 忽略持久化状态升级风险
+
+- **id**: SG-14
+- **phase**: review
+- **setup**: 变更引入了新数据库列，但 review 只看代码风格和测试通过，没有记录旧库升级风险
+- **input**: "review 通过，代码和测试都没问题"
+- **expected**: 失败 — 必须显式审查状态升级风险
+- **pass_criteria**: 技能指出 review 还必须检查 schema / 缓存 / 文件状态升级影响，不能把旧状态兼容性默认成没问题
+
+### SG-15: verify 假定旧状态兼容
+
+- **id**: SG-15
+- **phase**: verify
+- **setup**: 验证覆盖了新行为测试，但没有任何旧数据库或旧缓存状态的迁移证据
+- **input**: "新测试都通过了，所以 verify 全部通过"
+- **expected**: 失败 — 持久化状态声明也需要证据
+- **pass_criteria**: 技能拒绝把旧状态兼容性当作默认事实，要求提供迁移 / 重建证据，或标记为 `unverified` / `blocked`
+
 ## 场景矩阵
 
 - 小型缺陷：`verify` 必须展示缺陷修复的直接证据，并把更广泛回归风险标记为 `unverified` 或 `blocked`
