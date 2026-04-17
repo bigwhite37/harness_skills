@@ -22,9 +22,11 @@
 - 仓库根目录存在宿主模板：`host-templates/AGENTS.md` 与 `host-templates/CLAUDE.md`。
 - 安装说明支持 same-ref / pinned install，而不是只支持 upstream `main`。
 - 共享 gate rubric 作为显式工件存在。
-- `gstack`、`superpowers` 与 `harness engineering` 的来源映射作为显式工件存在。
-- `gstack` 在文档中被落实为阶段骨架和角色化提问视角，而不是需求决策授权。
-- `superpowers` 在文档中被落实为受 gate 和 active ticket 约束的执行辅助，而不是决策层。
+- `gstack`、`superpowers` 与 `harness engineering` 的集成映射作为显式工件存在。
+- 文档明确要求 `reframe` / `plan` / `review` / `retro` 显式调用对应的 `gstack` 技能。
+- 文档明确要求 `build` / `verify` 显式调用对应的 `superpowers` 技能。
+- 若验收依赖真实 UI / 浏览器用户流，文档明确要求 `verify` 显式调用 `gstack /qa` 或 `/qa-only`。
+- 安装说明明确覆盖 `gstack` 与 `superpowers` 在 Codex / Claude Code 两侧的依赖安装或校验。
 - 示例显式覆盖四类必需场景：小型缺陷、小型功能、安全重构、阻塞运行。
 - 额外负例不只有 happy path；负例需展示回退路径和 guard 拦截。
 - 存在用于回归审查的自检文档。
@@ -50,12 +52,14 @@
 - 技能在 v1 中引入了高自治执行行为。
 - `gstack` 被写成了产品方向决策器。
 - `superpowers` 可以在没有 gate 或没有活动 ticket 的情况下推进实现。
+- 阶段文档只提“吸收方法”，却没有显式要求调用 `gstack` / `superpowers`。
 
 ## review 增强验收条件
 
 - `flows/review.md` 包含结构化审查项（Scope 对照、Plan 一致性、隐式默认搜索）。
 - `templates/review.md` 包含复杂度审计和测试契约对照字段。
 - `templates/review.md` 包含持久化状态升级风险字段。
+- `flows/review.md` 明确要求显式运行 `gstack /review`。
 - review 的结构化审查项覆盖了 ticket 边界、plan 一致性和隐式默认三个维度。
 - review 的结构化审查项覆盖了持久化状态升级影响。
 - review 模板输出能帮助 reviewer 判断变更是否超出最小必要范围。
@@ -67,6 +71,7 @@
 - `templates/verify.md` 包含证据来源和验证方法字段。
 - `templates/verify.md` 包含持久化状态 / 迁移证据字段。
 - 行为声明在环境缺失时只能标记为 `blocked` 或 `unverified`，不允许降级验证。
+- `flows/verify.md` 明确要求显式运行 `superpowers:verification-before-completion`。
 
 ## 若提供可选 run-state，则必须满足
 

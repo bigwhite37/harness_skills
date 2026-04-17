@@ -2,7 +2,7 @@
 # ============================================================================
 # Tier 1 回归断言脚本
 # 维护工具，非 skill 运行时的一部分。从开发者终端执行。
-# 实现 evals/regression-cases.md 中的 12 个 RC 断言。
+# 实现 evals/regression-cases.md 中的 14 个 RC 断言。
 # ============================================================================
 
 set -euo pipefail
@@ -206,6 +206,45 @@ rc12() {
 }
 
 # ---------------------------------------------------------------------------
+# RC-13: 集成版阶段文档显式要求 gstack / superpowers 调用
+# ---------------------------------------------------------------------------
+rc13() {
+  local id="RC-13 外部技能显式调用点"
+  local ok=true
+  grep -q 'office-hours' "$ROOT/flows/reframe.md" 2>/dev/null || ok=false
+  grep -q 'plan-ceo-review' "$ROOT/flows/plan.md" 2>/dev/null || ok=false
+  grep -q 'plan-eng-review' "$ROOT/flows/plan.md" 2>/dev/null || ok=false
+  grep -q 'test-driven-development' "$ROOT/flows/build.md" 2>/dev/null || ok=false
+  grep -q '/review' "$ROOT/flows/review.md" 2>/dev/null || ok=false
+  grep -q 'verification-before-completion' "$ROOT/flows/verify.md" 2>/dev/null || ok=false
+  grep -q '/retro' "$ROOT/flows/retro.md" 2>/dev/null || ok=false
+  if $ok; then
+    pass "$id"
+  else
+    fail "$id" "flows/ 中缺少集成版必需的外部技能显式调用点"
+  fi
+}
+
+# ---------------------------------------------------------------------------
+# RC-14: 安装链路要求先安装 / 校验 gstack 与 superpowers 依赖
+# ---------------------------------------------------------------------------
+rc14() {
+  local id="RC-14 安装链路包含外部依赖"
+  local ok=true
+  grep -q 'GSTACK_SOURCE_REPO' "$ROOT/INSTALL.md" 2>/dev/null || ok=false
+  grep -q 'GSTACK_REV' "$ROOT/INSTALL.md" 2>/dev/null || ok=false
+  grep -q 'SUPERPOWERS_SOURCE_REPO' "$ROOT/INSTALL.md" 2>/dev/null || ok=false
+  grep -q 'SUPERPOWERS_PROVENANCE' "$ROOT/INSTALL.md" 2>/dev/null || ok=false
+  grep -q 'office-hours' "$ROOT/README.md" 2>/dev/null || ok=false
+  grep -q 'test-driven-development' "$ROOT/docs/usage.md" 2>/dev/null || ok=false
+  if $ok; then
+    pass "$id"
+  else
+    fail "$id" "INSTALL.md / README.md / docs/usage.md 未完整表达集成版外部依赖安装契约"
+  fi
+}
+
+# ---------------------------------------------------------------------------
 # 执行所有断言
 # ---------------------------------------------------------------------------
 echo "=== Tier 1 回归断言 (evals/regression-cases.md) ==="
@@ -223,6 +262,8 @@ rc09
 rc10
 rc11
 rc12
+rc13
+rc14
 
 echo ""
 echo "=== 汇总: $PASS_COUNT PASS / $FAIL_COUNT FAIL (共 $((PASS_COUNT + FAIL_COUNT))) ==="

@@ -1,7 +1,7 @@
 # ============================================================================
 # Tier 3 LLM-as-judge 评估配置
 # 维护工具，非 skill 运行时的一部分。从开发者终端执行。
-# 声明 24 个用例（TC-01~TC-09 触发用例 + SG-01~SG-15 阶段 Gate 用例）
+# 声明 27 个用例（TC-01~TC-09 触发用例 + SG-01~SG-18 阶段 Gate 用例）
 # ============================================================================
 
 model: claude-sonnet-4-20250514
@@ -10,6 +10,12 @@ judge_model: claude-sonnet-4-20250514
 context_files:
   - SKILL.md
   - flows/phase-order.md
+  - flows/reframe.md
+  - flows/plan.md
+  - flows/build.md
+  - flows/review.md
+  - flows/verify.md
+  - flows/retro.md
   - references/gate-rubric.md
   - guards/quick-fail.md
   - guards/no-silent-fallback.md
@@ -106,7 +112,7 @@ cases:
       不能直接默认环境正确，更不能跳过环境前提收敛。
 
   # =========================================================================
-  # 阶段 Gate 用例 SG-01 ~ SG-15
+  # 阶段 Gate 用例 SG-01 ~ SG-18
   # =========================================================================
   - id: SG-01
     category: stage-gate
@@ -239,3 +245,27 @@ cases:
     expected: 失败 — 持久化状态声明也需要证据
     pass_criteria: >
       技能拒绝把旧状态兼容性当作默认事实，要求提供迁移 / 重建证据，或标记为 unverified / blocked。
+
+  - id: SG-16
+    category: stage-gate
+    input: "需求已经收敛好了，不用 office-hours，直接写 reframe"
+    setup: "用户请求进入收敛流程，但阶段产物里没有任何 `gstack /office-hours` 记录。"
+    expected: 失败 — 集成版必须先显式调用 `gstack /office-hours`
+    pass_criteria: >
+      技能拒绝通过 reframe gate，要求先补 `gstack /office-hours` 结果，或因依赖缺失进入 blocked。
+
+  - id: SG-17
+    category: stage-gate
+    input: "ticket 很清楚了，直接改代码更快"
+    setup: "活动 ticket 已存在，但实现前没有任何 `superpowers:test-driven-development` 记录。"
+    expected: 失败 — 集成版 build 前必须显式调用 TDD
+    pass_criteria: >
+      技能拒绝进入 build，要求先使用 `superpowers:test-driven-development`。
+
+  - id: SG-18
+    category: stage-gate
+    input: "我已经手动看过测试输出了，直接写 verify 通过"
+    setup: "review 已通过，测试也跑过，但没有任何 `superpowers:verification-before-completion` 记录。"
+    expected: 失败 — 集成版 verify 前必须显式调用 verification-before-completion
+    pass_criteria: >
+      技能拒绝通过 verify gate，要求先显式运行 `superpowers:verification-before-completion`。

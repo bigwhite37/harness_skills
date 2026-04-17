@@ -11,6 +11,8 @@
 
 ## 输出
 
+- `gstack /plan-ceo-review` 结论
+- `gstack /plan-eng-review` 结论
 - 已选方案
 - 被拒绝的替代方案
 - 影响区域
@@ -20,7 +22,7 @@
 
 ## 通过条件
 
-当前只选定一个方案，且在 `build` 前就已经存在验证契约。
+已显式运行 `gstack /plan-ceo-review` 与 `gstack /plan-eng-review`，当前只选定一个方案，且在 `build` 前就已经存在验证契约。
 
 ## 来源约束
 
@@ -30,6 +32,14 @@
 
 ```md
 ## 计划
+
+gstack /plan-ceo-review:
+- 调用结果:
+- 约束 / 结论:
+
+gstack /plan-eng-review:
+- 调用结果:
+- 约束 / 结论:
 
 已选方案:
 

@@ -10,9 +10,11 @@
 - 活动 ticket
 - `plan` 输出
 - 仓库模式
+- `gstack` 的 `/review`
 
 ## 必需输出
 
+- `gstack` `/review` 的关键发现
 - 问题清单
 - 每条问题的严重级别
 - 通过或失败判断
@@ -20,6 +22,7 @@
 
 ## Gate
 
+- 已显式运行 `gstack` 的 `/review`，或因其不可用而进入 `blocked`
 - 不存在未解决的高严重度问题
 - 没有 范围漂移
 - 没有隐藏回退
@@ -39,6 +42,7 @@
 
 ## 失败条件
 
+- `gstack` 的 `/review` 缺失、不可调用或结果未被吸收
 - 实现偏离了 `ticket`
 - 方案偏离了 `plan`
 - 出现 implicit default behavior

@@ -267,20 +267,20 @@
 
 ### gstack 的职责
 
-gstack 只提供**阶段骨架和角色化提问方式**。
+在集成版 v1 中，gstack 不是“被内化后消失的方法论来源”，而是**被 skill 显式调用的外部技能集**。它只提供**阶段骨架和角色化提问方式**。
 
-可吸收的东西：
+必须显式调用的东西：
 
-* `office-hours` → 用于 `reframe` 的问题澄清和约束识别
-* `plan-ceo-review` → 用于 plan 阶段检查任务价值、范围和优先级合理性
-* `plan-eng-review` → 用于 plan 阶段检查技术路径、风险、依赖和复杂度
-* `review` → 对应 review 阶段
-* `qa` → 对应 verify 阶段
-* `retro` → 对应 retro 阶段
+* `office-hours` → `reframe` 前必须显式调用，用于问题澄清和约束识别
+* `plan-ceo-review` → `plan` 前必须显式调用，用于检查任务价值、范围和优先级合理性
+* `plan-eng-review` → `plan` 前必须显式调用，用于检查技术路径、风险、依赖和复杂度
+* `review` → `review` 阶段必须显式调用
+* `qa` / `qa-only` → 仅当 verify 契约确实依赖真实 UI / 浏览器用户流时显式调用
+* `retro` → `retro` 阶段必须显式调用
 
-不能吸收的东西：
+不能做的事：
 
-* 命令形态；
+* 把这些调用点吸收到 skill 内部，导致运行期看不见显式调用记录；
 * 任意新增流程阶段；
 * 把角色化对话变成产品决策授权。
 
@@ -288,12 +288,18 @@ gstack 只提供**阶段骨架和角色化提问方式**。
 
 ### superpowers 的职责
 
-superpowers 只提供**低自由度执行增强**：
+在集成版 v1 中，superpowers 也不是抽象来源，而是**被 skill 显式调用的外部技能集**。它只提供**低自由度执行增强**：
 
 * 文件操作
 * 任务拆解
 * 多步骤执行
 * 上下文组织
+
+并且它在关键阶段承担显式 gate 前置义务：
+
+* `test-driven-development` → `build` 前必须显式调用
+* `systematic-debugging` → 只在 bug、失败或异常行为出现后显式调用，再讨论修复
+* `verification-before-completion` → `verify` 前必须显式调用
 
 它只能在“已经过 gate 的阶段”和“已经激活的 ticket”里工作。它不能：
 
@@ -302,6 +308,7 @@ superpowers 只提供**低自由度执行增强**：
 * 自行改写 plan；
 * 开启高自由度 agent loop；
 * 以“提高效率”为名绕过 review / verify。
+* 在没有 bug、失败或异常现象时把 `systematic-debugging` 变成拖延性 ritual。
 
 一句话：**superpowers 是手脚，不是方向盘。**
 
@@ -596,4 +603,3 @@ Codex 官方把 `AGENTS.md` 作为工作前就生效的项目指导，把 repo-l
 [4]: https://developers.openai.com/codex/skills/?utm_source=chatgpt.com "Agent Skills – Codex"
 [5]: https://developers.openai.com/codex/changelog?date=2026-01-06&utm_source=chatgpt.com "Codex changelog"
 [6]: https://developers.openai.com/codex/guides/agents-md/?utm_source=chatgpt.com "Custom instructions with AGENTS.md – Codex"
-

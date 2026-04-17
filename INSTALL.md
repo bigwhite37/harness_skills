@@ -4,14 +4,18 @@
 
 ## Goal
 
-完成一次双宿主安装或升级：
+完成一次集成安装或升级：
 
-- `bootstrap install`
+- 先确保当前 agent 机器上的外部依赖已可用：
+  - `gstack`
+  - `superpowers`
+- 再完成一次双宿主安装或升级：
+  - `bootstrap install`
   - 安装 Codex skill：`.agents/skills/convergent-dev-flow/`
   - 安装 Claude Code skill：`.claude/skills/convergent-dev-flow/`
   - 直接按本仓库模板重写宿主 `AGENTS.md`
   - 直接按本仓库模板重写宿主 `CLAUDE.md`
-- `update existing install`
+  - `update existing install`
   - 更新 Codex / Claude Code 的 skill 包
   - 保留宿主现有 `AGENTS.md` / `CLAUDE.md`
 
@@ -34,6 +38,32 @@ ref 选择规则：
 
 如果你要对用户声称“某个已发布 ref 的公开远端安装入口已经可用”，必须先证明该 ref 的 raw `INSTALL.md` URL 可直接访问并返回 `200`。本地候选版本可以安装，不等于同一 ref 已经发布可用。
 
+## External Dependencies
+
+`convergent-dev-flow` 现在是集成编排器，不再假设 `gstack` / `superpowers` 只是“已被吸收的方法论”。
+
+你必须先确保当前 host 的外部依赖可用：
+
+- `gstack`
+  - canonical repo: `https://github.com/garrytan/gstack.git`
+  - Codex 官方安装目标：`~/.codex/skills/gstack` 后执行 `./setup --host codex`
+  - Claude Code 官方安装目标：`~/.claude/skills/gstack` 后执行 `./setup`
+- `superpowers`
+  - canonical repo: `https://github.com/obra/superpowers.git`
+  - Codex 官方安装入口：`https://raw.githubusercontent.com/obra/superpowers/refs/heads/main/.codex/INSTALL.md`
+  - Claude Code 官方安装入口：`/plugin install superpowers@claude-plugins-official`
+
+安装 `convergent-dev-flow` 前，必须有直接证据表明以下能力对当前 host 可用：
+
+- `gstack`: `office-hours`、`plan-ceo-review`、`plan-eng-review`、`review`、`retro`
+- `superpowers`: `test-driven-development`、`systematic-debugging`、`verification-before-completion`
+
+若任务验收依赖真实 UI / 浏览器用户流，还必须额外确保：
+
+- `gstack`: `qa` 或 `qa-only`
+
+若当前 host 无法完成这些机器级依赖安装，必须输出 `blocked` 并给出精确缺失步骤。不要继续安装一个会在运行期缺依赖的半成品 skill。
+
 ## Install Contract
 
 你必须先判定模式，再执行：
@@ -42,8 +72,14 @@ ref 选择规则：
 
 - `SOURCE_REPO`
 - `SOURCE_REF`
+- `GSTACK_SOURCE_REPO`
+- `GSTACK_REV`
+- `SUPERPOWERS_SOURCE_REPO`
+- `SUPERPOWERS_PROVENANCE`
 
 `SOURCE_REF` 必须是这次安装实际使用的 branch/tag/commit。不要只在脑中判断；要把它写进安装过程记录和最终汇报。
+
+`SUPERPOWERS_PROVENANCE` 必须记录当前 host 上 superpowers 的真实来源标识。若是 git / clone / raw installer 路径，可记录 commit / tag / branch；若是 Claude Code plugin 路径，则记录 plugin id 与可见版本。不要为 plugin 安装伪造 git rev。
 
 若本轮是“已发布 ref 的远端安装验证”，还必须额外记录：
 
@@ -59,11 +95,12 @@ ref 选择规则：
 
 bootstrap 必须完成：
 
-1. 获取指定 ref 的源码到临时目录。
-2. 在宿主仓库中创建或重建以下目录：
+1. 先确保当前 host 上的 `gstack` 与 `superpowers` 依赖已安装并已验证。
+2. 获取指定 ref 的源码到临时目录。
+3. 在宿主仓库中创建或重建以下目录：
    - `.agents/skills/convergent-dev-flow/`
    - `.claude/skills/convergent-dev-flow/`
-3. 复制 skill 包内容到两个目录：
+4. 复制 skill 包内容到两个目录：
    - `SKILL.md`
    - `flows/`
    - `guards/`
@@ -74,12 +111,12 @@ bootstrap 必须完成：
    - `docs/usage.md`
    - `docs/self-check.md`
    - `docs/acceptance.md`
-4. 用源码仓库中的宿主模板 **直接重写**：
+5. 用源码仓库中的宿主模板 **直接重写**：
    - `AGENTS.md` <- `host-templates/AGENTS.md`
    - `CLAUDE.md` <- `host-templates/CLAUDE.md`
-5. 编辑 Claude 副本的 `SKILL.md` frontmatter，加入：
+6. 编辑 Claude 副本的 `SKILL.md` frontmatter，加入：
    - `disable-model-invocation: true`
-6. 做安装后校验，并向用户汇报。
+7. 做安装后校验，并向用户汇报。
 
 ### Update existing install
 
@@ -87,23 +124,24 @@ bootstrap 必须完成：
 
 update 必须完成：
 
-1. 获取指定 ref 的源码到临时目录。
-2. 更新：
+1. 先确保当前 host 上的 `gstack` 与 `superpowers` 依赖仍然可用；若已损坏或缺失，先修复。
+2. 获取指定 ref 的源码到临时目录。
+3. 更新：
    - `.agents/skills/convergent-dev-flow/`
    - `.claude/skills/convergent-dev-flow/`
-3. 在更新前记录宿主规则文件快照或校验值，例如：
+4. 在更新前记录宿主规则文件快照或校验值，例如：
    - `AGENTS_BEFORE_SHA`
    - `CLAUDE_BEFORE_SHA`
-4. 保留现有：
+5. 保留现有：
    - `AGENTS.md`
    - `CLAUDE.md`
-5. 继续确保 Claude 副本的 `SKILL.md` frontmatter 中存在：
+6. 继续确保 Claude 副本的 `SKILL.md` frontmatter 中存在：
    - `disable-model-invocation: true`
-6. 更新后再次记录：
+7. 更新后再次记录：
    - `AGENTS_AFTER_SHA`
    - `CLAUDE_AFTER_SHA`
-7. 对照前后值，确认宿主规则文件未被本轮覆盖。
-8. 做安装后校验，并向用户汇报。
+8. 对照前后值，确认宿主规则文件未被本轮覆盖。
+9. 做安装后校验，并向用户汇报。
 
 ## Files You Must Not Copy Into Host Skill Dirs
 
@@ -117,6 +155,7 @@ update 必须完成：
 - `scripts/`
 - `Makefile`
 - 本地配置文件
+- 不要把 `gstack` 或 `superpowers` 的源码仓库整包复制进 `.agents/skills/convergent-dev-flow/` 或 `.claude/skills/convergent-dev-flow/`
 
 ## Required Host Layout
 
@@ -158,6 +197,25 @@ disable-model-invocation: true
 ## Suggested Procedure
 
 你可以使用等价命令，但必须满足上面的安装契约。
+
+### 0. Ensure external dependencies
+
+在继续前，先确保当前 host 上可直接使用：
+
+- `gstack`
+  - Codex: 安装或修复到 `~/.codex/skills/gstack`，并执行 `./setup --host codex`
+  - Claude Code: 安装或修复到 `~/.claude/skills/gstack`，并执行 `./setup`
+- `superpowers`
+  - Codex: 按其官方 `.codex/INSTALL.md` 完成安装
+  - Claude Code: 按其官方 plugin 方式完成安装
+
+至少记录：
+
+- `GSTACK_SOURCE_REPO`
+- `GSTACK_REV`
+- `SUPERPOWERS_SOURCE_REPO`
+- `SUPERPOWERS_PROVENANCE`
+- 当前 host 上可用的命令 / 技能证据
 
 ### 1. Clone or refresh source
 
@@ -215,33 +273,38 @@ Codex 副本不要添加该字段。
 
 至少验证以下事实：
 
-1. 两侧 skill 目录都存在。
-2. 安装记录中存在：
+1. 当前 host 上存在直接证据表明 `gstack` 与 `superpowers` 依赖可用。
+2. 两侧 skill 目录都存在。
+3. 安装记录中存在：
    - `SOURCE_REPO`
    - `SOURCE_REF`
-3. 若本轮对外宣称的是已发布 ref 的公开安装能力，安装记录中存在：
+   - `GSTACK_SOURCE_REPO`
+   - `GSTACK_REV`
+   - `SUPERPOWERS_SOURCE_REPO`
+   - `SUPERPOWERS_PROVENANCE`
+4. 若本轮对外宣称的是已发布 ref 的公开安装能力，安装记录中存在：
    - `INSTALL_RAW_URL`
    - `INSTALL_RAW_HTTP_STATUS`
-4. 若本轮对外宣称的是已发布 ref 的公开安装能力，确认：
+5. 若本轮对外宣称的是已发布 ref 的公开安装能力，确认：
    - `INSTALL_RAW_HTTP_STATUS == 200`
-5. 两侧 skill 目录都包含 `SKILL.md`、`flows/`、`guards/`、`templates/`、`references/`、`examples/`、`evals/` 和 `docs/`。
-6. 两侧 skill 目录都包含：
+6. 两侧 skill 目录都包含 `SKILL.md`、`flows/`、`guards/`、`templates/`、`references/`、`examples/`、`evals/` 和 `docs/`。
+7. 两侧 skill 目录都包含：
    - `docs/usage.md`
    - `docs/self-check.md`
    - `docs/acceptance.md`
-7. 若本轮是 `bootstrap install` 或显式 reset，`AGENTS.md` 中存在：
+8. 若本轮是 `bootstrap install` 或显式 reset，`AGENTS.md` 中存在：
    - `convergent-dev-flow bootstrap-template: AGENTS`
-8. 若本轮是 `bootstrap install` 或显式 reset，`CLAUDE.md` 中存在：
+9. 若本轮是 `bootstrap install` 或显式 reset，`CLAUDE.md` 中存在：
    - `convergent-dev-flow bootstrap-template: CLAUDE`
-9. `AGENTS.md` 中显式出现 `$convergent-dev-flow`。
-10. `CLAUDE.md` 中显式出现 `/convergent-dev-flow`。
-11. `.claude/skills/convergent-dev-flow/SKILL.md` 中存在 `disable-model-invocation: true`。
-12. 若本轮是 `update existing install`，存在：
+10. `AGENTS.md` 中显式出现 `$convergent-dev-flow`。
+11. `CLAUDE.md` 中显式出现 `/convergent-dev-flow`。
+12. `.claude/skills/convergent-dev-flow/SKILL.md` 中存在 `disable-model-invocation: true`。
+13. 若本轮是 `update existing install`，存在：
     - `AGENTS_BEFORE_SHA`
     - `AGENTS_AFTER_SHA`
     - `CLAUDE_BEFORE_SHA`
     - `CLAUDE_AFTER_SHA`
-13. 若本轮是 `update existing install`，确认：
+14. 若本轮是 `update existing install`，确认：
     - `AGENTS_BEFORE_SHA == AGENTS_AFTER_SHA`
     - `CLAUDE_BEFORE_SHA == CLAUDE_AFTER_SHA`
 
@@ -251,6 +314,7 @@ Codex 副本不要添加该字段。
 
 - 你创建或重写了哪些路径
 - 这次安装实际使用的 `SOURCE_REF`
+- `gstack` / `superpowers` 的安装或校验结果，以及实际记录的 `GSTACK_REV` / `SUPERPOWERS_PROVENANCE`
 - 若本轮对外宣称的是已发布 ref 的公开安装能力，`INSTALL_RAW_URL` 和 `INSTALL_RAW_HTTP_STATUS`
 - Codex / Claude Code 两侧是否都安装成功
 - Claude 副本是否已补 `disable-model-invocation: true`

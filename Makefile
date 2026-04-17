@@ -13,7 +13,7 @@ test: tier1 tier2
 probe-install:
 	@bash scripts/check_remote_install.sh --ref "$(REF)" --repo "$(REPO)"
 
-# Tier 1: 回归断言（12 个 RC）
+# Tier 1: 回归断言（14 个 RC）
 tier1:
 	@bash scripts/tier1_regression.sh
 
@@ -21,7 +21,7 @@ tier1:
 tier2:
 	@bash scripts/tier2_selfcheck.sh
 
-# Tier 3: LLM-as-judge 评估（24 个用例，需要 ANTHROPIC_API_KEY）
+# Tier 3: LLM-as-judge 评估（27 个用例，需要 ANTHROPIC_API_KEY）
 tier3:
 	@python3 scripts/tier3_llm_eval.py $(ARGS)
 

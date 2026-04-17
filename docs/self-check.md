@@ -28,8 +28,8 @@
 ## 来源系统检查
 
 - `references/source-system-mapping.md` 是否仍然存在且与当前文档一致？
-- `gstack` 是否仍然只承担阶段骨架和角色化提问视角？
-- `superpowers` 是否仍然只承担受 gate 和 active ticket 约束的执行辅助？
+- `gstack` 是否仍然通过显式技能调用承担阶段骨架和角色化提问视角？
+- `superpowers` 是否仍然通过显式技能调用承担受 gate 和 active ticket 约束的执行辅助？
 - `harness engineering` 是否仍然只承担 gate、evidence、fail 和 retro 的 veto 纪律？
 
 ## 防漂移检查
@@ -37,6 +37,7 @@
 - 是否有改动把 脚本、hooks、subagents、并行工作、部署、发布或其他副作用工作流 带入了 v1？
 - 是否有改动让 `gstack` 从阶段骨架变成需求方向决策者？
 - 是否有改动让 superpowers 从执行辅助变成决策者？
+- 是否有改动把 `convergent-dev-flow` 退回成“只吸收方法论、不显式调用外部技能”的 standalone 版本？
 - 是否有改动让这个技能表现得像通用自治智能体？
 - 是否有改动删掉了四类必需示例或对应的 eval 覆盖？
 - 是否有改动把消费端 `.agents/` 或 `.claude/` 镜像目录重新引入为 repo 主布局？
@@ -49,6 +50,7 @@
 - README / INSTALL 是否清晰区分了 `bootstrap install` 与保留宿主规则的 `update` 路径？
 - README / INSTALL 是否支持按同一 branch/tag/commit 安装，而不是强制漂到 upstream `main`？
 - `INSTALL.md` 是否要求记录本轮实际使用的 `SOURCE_REF`？
+- `INSTALL.md` 是否要求安装或校验 `gstack` 与 `superpowers` 依赖？
 - 若对外宣称某个已发布 ref 的公开安装入口可用，是否要求先证明该 ref 的 raw `INSTALL.md` 返回 `200`？
 - `INSTALL.md` 是否要求在 `update existing install` 中记录宿主规则文件的前后校验值，并用它证明未被覆盖？
 - README、`Makefile` 注释和 `scripts/tier2_selfcheck.sh` 的 Tier 2 断言数量是否一致？
@@ -64,6 +66,8 @@
 
 - `flows/review.md` 是否包含结构化审查项（Scope 对照、Plan 一致性、隐式默认搜索）？
 - `flows/review.md` 是否显式检查持久化状态升级影响？
+- `flows/reframe.md` / `flows/plan.md` / `flows/review.md` / `flows/retro.md` 是否都显式要求对应的 `gstack` 调用？
+- `flows/build.md` / `flows/verify.md` 是否显式要求对应的 `superpowers` 调用？
 - `references/gate-rubric.md` 是否包含声明类型与证据类型分类？
 - `templates/verify.md` 是否包含证据来源和验证方法字段？
 - `templates/review.md` 和 `templates/verify.md` 是否都覆盖了持久化状态 / 迁移风险记录？

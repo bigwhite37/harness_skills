@@ -6,10 +6,10 @@
 
 `reframe -> plan -> ticket -> build -> review -> verify -> retro`
 
-它融合了三层能力：
+它编排三层能力：
 
-- `gstack`：阶段骨架和角色化审视视角
-- `superpowers`：受 gate 和活动 ticket 约束的低自由度执行增强
+- `gstack`：通过显式技能调用提供阶段骨架和角色化审视视角
+- `superpowers`：通过显式技能调用提供受 gate 和活动 ticket 约束的低自由度执行增强
 - `harness engineering`：gate、evidence、quick fail、blocked、retro 纪律
 
 这个仓库的规范源码结构见：
@@ -25,9 +25,10 @@
 
 1. 在目标仓库根目录，把安装 prompt 直接交给代码代理。
 2. 让代理读取 [INSTALL.md](INSTALL.md) 并自动 clone / 更新源码、创建宿主目录、安装 skill。
-3. 首次安装或显式 reset 时走 `bootstrap install`：按本仓库模板重写宿主 `AGENTS.md` 与 `CLAUDE.md`。
-4. 已有安装且需要保留宿主永久规则时走 `update existing install`：只更新 skill 包，不重写宿主 `AGENTS.md` / `CLAUDE.md`。
-5. 在目标仓库里显式触发，不依赖自动匹配。
+3. 让代理先确保当前 host 的 `gstack` / `superpowers` 依赖已按官方方式安装。
+4. 首次安装或显式 reset 时走 `bootstrap install`：按本仓库模板重写宿主 `AGENTS.md` 与 `CLAUDE.md`。
+5. 已有安装且需要保留宿主永久规则时走 `update existing install`：只更新 skill 包，不重写宿主 `AGENTS.md` / `CLAUDE.md`。
+6. 在目标仓库里显式触发，不依赖自动匹配。
 
 ## 安装
 
@@ -75,6 +76,7 @@ Fetch and follow instructions from https://raw.githubusercontent.com/bigwhite37/
 
 安装器会自动完成以下动作：
 
+- 先安装或校验当前 host 上的 `gstack` 与 `superpowers`
 - clone 或更新 `harness_skills` 源码
 - 创建 `.agents/skills/convergent-dev-flow/`
 - 创建 `.claude/skills/convergent-dev-flow/`
@@ -94,6 +96,9 @@ Fetch and follow instructions from https://raw.githubusercontent.com/bigwhite37/
 
 - Codex 侧用 `$convergent-dev-flow`
 - Claude Code 侧用 `/convergent-dev-flow`
+- 当前 host 上应已可直接使用：
+  - `gstack`: `office-hours`、`plan-ceo-review`、`plan-eng-review`、`review`、`retro`
+  - `superpowers`: `test-driven-development`、`systematic-debugging`、`verification-before-completion`
 - 宿主常驻规则落在生成后的 `AGENTS.md` / `CLAUDE.md`
 - 任务触发型工作流逻辑留在 `.agents/skills/convergent-dev-flow/` 与 `.claude/skills/convergent-dev-flow/`
 
@@ -131,6 +136,11 @@ Fetch and follow instructions from https://raw.githubusercontent.com/bigwhite37/
 - `AGENTS.md` 中的 `convergent-dev-flow bootstrap-template: AGENTS`
 - `CLAUDE.md` 中的 `convergent-dev-flow bootstrap-template: CLAUDE`
 
+此外，当前 host 上还应有直接证据表明：
+
+- `gstack` 依赖已可用
+- `superpowers` 依赖已可用
+
 不要把 `README.md`、源码仓库根目录的 `AGENTS.md`、`INSTALL.md`、`docs/raw/`、`host-templates/`、`scripts/`、`Makefile` 或本地配置文件复制到宿主技能目录。
 
 ## 安装后怎么用
@@ -146,8 +156,16 @@ Fetch and follow instructions from https://raw.githubusercontent.com/bigwhite37/
 安装后必须保持这些纪律：
 
 - 显式触发，不依赖自动匹配
+- `reframe` 显式调用 `gstack /office-hours`
+- `plan` 显式调用 `gstack /plan-ceo-review` 与 `/plan-eng-review`
 - 不跳过 `ticket`
+- `build` 显式调用 `superpowers:test-driven-development`
+- 发生故障或意外行为时，先调用 `superpowers:systematic-debugging`
+- `review` 显式调用 `gstack /review`
 - 不混合 `review` 和 `verify`
+- `verify` 显式调用 `superpowers:verification-before-completion`
+- 若验收依赖真实 UI / 浏览器用户流，`verify` 还要显式调用 `gstack /qa` 或 `/qa-only`
+- `retro` 显式调用 `gstack /retro`
 - 不在没有证据时宣称完成
 - 不在没有 gate 或没有活动 ticket 时让 `superpowers` 推进实现
 - 宿主新增永久规则时，只追加到 `AGENTS.md` / `CLAUDE.md`，不要改写 skill 包
@@ -175,10 +193,10 @@ Fetch and follow instructions from https://raw.githubusercontent.com/bigwhite37/
 | 层 | 命令 | 内容 | API 依赖 |
 |---|---|---|---|
 | Published Ref Probe | `make probe-install REF=refs/heads/main` | 验证某个已发布 ref 的 raw `INSTALL.md` 是否可直接访问 | 网络 |
-| Tier 1 | `make tier1` | 12 个回归断言（RC-01~RC-12） | 无 |
+| Tier 1 | `make tier1` | 14 个回归断言（RC-01~RC-14） | 无 |
 | Tier 2 | `make tier2` | 21 个自检断言（SC-01~SC-21） | 无 |
-| Tier 3 | `make tier3` | 24 个 LLM-as-judge 用例（TC + SG） | ANTHROPIC_API_KEY |
-| Tier 4 | `make tier4` | 只用 Codex 的宿主黑盒验证，覆盖安装链路 + 真实开发闭环 | Codex CLI + OpenAI auth + `conda` `py310` |
+| Tier 3 | `make tier3` | 27 个 LLM-as-judge 用例（TC + SG） | ANTHROPIC_API_KEY |
+| Tier 4 | `make tier4` | 只用 Codex 的宿主黑盒验证，覆盖安装链路、显式下层 skill 调用审计与真实开发闭环 | Codex CLI + OpenAI auth + `conda` `py310` |
 
 快速验证（无 API）：
 

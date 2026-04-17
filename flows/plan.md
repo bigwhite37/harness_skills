@@ -8,9 +8,12 @@
 
 - 已通过的 `reframe` 输出
 - 必需的代码探索结果
+- `gstack` 的 `/plan-ceo-review` 与 `/plan-eng-review` 可用性
 
 ## 必需输出
 
+- `gstack` `/plan-ceo-review` 结论
+- `gstack` `/plan-eng-review` 结论
 - 已选方案
 - 被否决的替代方案
 - 受影响区域
@@ -20,6 +23,7 @@
 
 ## Gate
 
+- 已显式运行 `gstack` 的 `/plan-ceo-review` 与 `/plan-eng-review`，或因其不可用而进入 `blocked`
 - 当前只有一个 active 方案
 - 影响面可以被清楚描述
 - `build` 之前必须先存在验证方式
@@ -32,6 +36,7 @@
 
 ## 失败条件
 
+- 任一必需 `gstack` 计划审查缺失、不可调用或结果未被 plan 吸收
 - 没有清晰的验证路径
 - 同时存在多个未决方案
 - 影响面失控

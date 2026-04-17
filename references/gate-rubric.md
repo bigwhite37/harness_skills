@@ -18,6 +18,7 @@
 
 ### `reframe`
 
+- 是否已显式运行 `gstack /office-hours`，或已因其不可用而 `blocked`？
 - 是否只有一个主目标？
 - 成功标准之后是否可验证？
 - 非目标和假设是否显式？
@@ -25,6 +26,7 @@
 
 ### `plan`
 
+- 是否已显式运行 `gstack /plan-ceo-review` 与 `gstack /plan-eng-review`，或已因其不可用而 `blocked`？
 - 当前是否只有一个方案？
 - `build` 前是否已存在验证契约？
 - 影响区域是否受控？
@@ -38,18 +40,23 @@
 
 ### `build`
 
+- 是否已显式运行 `superpowers:test-driven-development`？
+- 若出现 bug、失败或异常行为，是否先显式运行了 `superpowers:systematic-debugging`？
 - 每条变更是否都能映射到活动 ticket？
 - 是否不存在 顺手夹带的额外内容？
 - 在进入 `review` 前，明显错误状态是否已经清除？
 
 ### `review`
 
+- 是否已显式运行 `gstack /review`，或已因其不可用而 `blocked`？
 - 是否不存在未解决的高严重度问题？
 - Scope drift 是否不存在，或已被显式判失败？
 - 隐藏回退是否不存在，或已被显式判失败？
 
 ### `verify`
 
+- 是否已显式运行 `superpowers:verification-before-completion`？
+- 若验收依赖真实 UI / 浏览器用户流，是否已显式运行 `gstack /qa` 或 `/qa-only`？
 - 每个验收点是否都有直接证据，或已被显式标记为 `blocked`？
 - 必需检查是否真的执行过，或其未执行原因被显式正当化？
 - 结论是否与证据完全一致？
@@ -57,6 +64,7 @@
 
 ### `retro`
 
+- 是否已显式运行 `gstack /retro`？
 - 是否至少存在一条具体流程学习，或有合理说明表明无需改动？
 - `retro` 是否避免了产品 backlog 替代和纯口号输出？
 

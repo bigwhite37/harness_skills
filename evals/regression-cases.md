@@ -100,6 +100,22 @@
 - **check_method**: 文本搜索 — 确认宪法第 16 条存在且措辞未被削弱
 - **severity**: critical
 
+### RC-13: 外部技能显式调用点
+
+- **id**: RC-13
+- **target_files**: flows/reframe.md, flows/plan.md, flows/build.md, flows/review.md, flows/verify.md, flows/retro.md
+- **assertion**: 集成版阶段文档显式要求对应的 `gstack` / `superpowers` 调用
+- **check_method**: 文本搜索 — 确认 `office-hours`、`plan-ceo-review`、`plan-eng-review`、`test-driven-development`、`review`、`verification-before-completion`、`retro` 在对应阶段文件中存在
+- **severity**: critical
+
+### RC-14: 安装链路包含外部依赖
+
+- **id**: RC-14
+- **target_files**: INSTALL.md, README.md, docs/usage.md
+- **assertion**: 安装与使用文档不再把 `gstack` / `superpowers` 描述成纯来源映射，而是要求先安装或校验外部依赖
+- **check_method**: 文本搜索 — 确认存在 `GSTACK_SOURCE_REPO`、`GSTACK_REV`、`SUPERPOWERS_SOURCE_REPO`、`SUPERPOWERS_PROVENANCE`、`office-hours`、`test-driven-development` 等安装或使用要求
+- **severity**: critical
+
 ## 预期结果
 
 只要任一回归检查失败，都应将这个技能视为不合规，直到措辞或结构重新收紧。
